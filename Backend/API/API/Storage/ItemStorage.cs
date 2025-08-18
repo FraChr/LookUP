@@ -12,8 +12,16 @@ public class ItemStorage
     public Item[] GetItems()
     {
         var connection = new  SqlConnection(_connectionString);
-        var sql = "SELECT * FROM Items JOIN Room ON Items.Id = Room.Id";
-        // var sql = "SELECT * FROM Items";
+        var sql = """
+                  SELECT Items.Id,
+                         Items.Name,
+                         items.Amount,
+                         Room.Name AS Location
+                  FROM Items 
+                      JOIN Room 
+                  ON Items.Location = Room.Id
+                  """;
+
         var con = connection.Query<Item>(sql).ToArray();
         return con;
     }

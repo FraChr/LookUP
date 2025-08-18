@@ -1,20 +1,21 @@
 ﻿<script setup>
-  import Menu from './Menu.vue'
+  import Menu from './Menu/Menu.vue';
+
 </script>
 
 <template>
-  <div class="container">
-    <h1 class="text-black text-2xl">LookUp</h1>
-    <img src="data:" alt width="50" height="50"/>
+  <header class="m-5 bg-sky-400 flex flex-row justify-between items-center pl-5 pr-5 pt-2 pb-2">
     <Menu/>
-  </div>
+    <h1 class="text-black text-2xl">
+      <RouterLink to="/">
+        LookUp
+      </RouterLink>
+    </h1>
+    <RouterLink to="/user">
+      <img src="../assets/img/75.jpg" alt width="50" height="50"/>
+    </RouterLink>
+  </header>
 </template>
 
 <style scoped>
-  .container {
-    display: flex;
-    flex-direction: row;
-    justify-content: center;
-    align-items: center;
-  }
 </style>

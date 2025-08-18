@@ -7,7 +7,21 @@ var builder = WebApplication.CreateBuilder(args);
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowLocalhost8080",
+        policy =>
+        {
+            policy.WithOrigins("http://localhost:8080")
+                .AllowAnyHeader()
+                .AllowAnyMethod();
+        });
+});
+
+
 var app = builder.Build();
+
+app.UseCors("AllowLocalhost8080");
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -19,7 +33,7 @@ app.UseHttpsRedirection();
 
 var itemStorage = new ItemStorage();
 
-app.MapGet("/", () =>
+app.MapGet("/storage", () =>
 {
     return itemStorage.GetItems();
 });

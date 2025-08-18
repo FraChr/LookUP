@@ -1,10 +1,13 @@
 ﻿<script setup>
-  import mainView from './components/mainView.vue'
-  import Header from './components/Header.vue'
+import Header from '@/components/Header.vue'
 </script>
 
 <template>
-  <Header/>
+  <Header />
+  <div class="p-8 pt-5">
+    <RouterView />
+  </div>
+
 </template>
 
 <style scoped></style>
