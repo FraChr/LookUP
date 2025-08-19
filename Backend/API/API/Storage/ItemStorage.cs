@@ -25,4 +25,19 @@ public class ItemStorage
         var con = connection.Query<Item>(sql).ToArray();
         return con;
     }
+
+    public void DeleteItem(int itemId)
+    {
+        var connection = new  SqlConnection(_connectionString);
+        var sql = "DELETE FROM Items WHERE Id = @LookUpId";
+        var rowsAffected = connection.Execute(sql, new { LookUpId = itemId });
+    }
+
+    public Location[] getLocations()
+    {
+        var connection = new  SqlConnection(_connectionString);
+        var sql = "SELECT * FROM Room";
+        var con = connection.Query<Location>(sql).ToArray();
+        return con;
+    }
 }

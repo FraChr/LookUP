@@ -1,5 +1,4 @@
 using API.Storage;
-using API.Model;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -12,12 +11,11 @@ builder.Services.AddCors(options =>
     options.AddPolicy("AllowLocalhost8080",
         policy =>
         {
-            policy.WithOrigins("http://localhost:8080")
+            policy.WithOrigins("http://localhost:8080", "http://localhost:5173")
                 .AllowAnyHeader()
                 .AllowAnyMethod();
         });
 });
-
 
 var app = builder.Build();
 
@@ -37,6 +35,19 @@ app.MapGet("/storage", () =>
 {
     return itemStorage.GetItems();
 });
+
+app.MapGet("/location", () =>
+{
+    return itemStorage.getLocations();
+});
+
+
+app.MapDelete("/storage/{id}", (int id) =>
+{
+    itemStorage.DeleteItem(id);
+    return Results.NoContent();
+});
+
 
 
 
