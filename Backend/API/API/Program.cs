@@ -1,6 +1,6 @@
 using API.Model;
+using API.Services;
 using API.Services.Interfaces;
-using API.Services.ItemServices;
 using API.Storage;
 
 var builder = WebApplication.CreateBuilder(args);
