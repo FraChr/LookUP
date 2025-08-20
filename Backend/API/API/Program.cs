@@ -1,3 +1,6 @@
+using API.Model;
+using API.Services.Interfaces;
+using API.Services.ItemServices;
 using API.Storage;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -17,6 +20,11 @@ builder.Services.AddCors(options =>
         });
 });
 
+builder.Services.AddRazorPages();
+
+builder.Services.AddScoped<ICrudService<Items>, ItemService>();
+builder.Services.AddScoped<ICrudService<Location>, LocationService>();
+
 var app = builder.Build();
 
 app.UseCors("AllowLocalhost8080");
@@ -29,26 +37,9 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-var itemStorage = new ItemStorage();
-
-app.MapGet("/storage", () =>
-{
-    return itemStorage.GetItems();
-});
-
-app.MapGet("/location", () =>
-{
-    return itemStorage.getLocations();
-});
-
-
-app.MapDelete("/storage/{id}", (int id) =>
-{
-    itemStorage.DeleteItem(id);
-    return Results.NoContent();
-});
-
-
+var storageEndpoints = new EndpointMapperService();
+storageEndpoints.MapEndpoints<Items>(app, "storage");
+storageEndpoints.MapEndpoints<Location>(app, "location");
 
 
 app.Run();
