@@ -6,15 +6,18 @@ public class EndpointMapperService : IEndpointMapper
 {
     public void MapEndpoints<T>(WebApplication app, string route)
     {
-        app.MapGet($"/{route}", (ICrudService<T> storage) =>
+        app.MapGet($"/{route}", (int? limit, int? page, ICrudService<T> storage) =>
         {
-            return storage.GetAll();
+            Console.WriteLine($"Limit: {limit}, Page: {page}");
+
+            return storage.GetAll(limit, page);
         });
 
-        // app.MapPost($"/{route}", (ICrudService<T> storage) =>
-        // {
-        //
-        // });
+        app.MapPost($"/{route}", (T item, ICrudService<T> storage) =>
+        {
+            storage.Create(item);
+            return Results.Ok(storage);
+        });
         //
         // app.MapPut($"/{route}/{{id}}", (int id, ICrudService<T> storage) =>
         // {

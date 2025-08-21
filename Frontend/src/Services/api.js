@@ -7,7 +7,7 @@ const apiClient = axios.create({
   }
 });
 
-export const getStorage = () => apiClient.get('/storage');
+export const getStorage = (config = {}) => apiClient.get('/storage', config);
 export const deleteItem = (id) => apiClient.delete(`/storage/${id}`);
 export const addItem = (item) => apiClient.post(`/storage`, item);
 

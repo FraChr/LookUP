@@ -1,4 +1,4 @@
-﻿<script setup lang="ts">
+﻿<script setup>
   import {ref, watch} from 'vue';
   import MenuItems from '@/components/Menu/MenuItems.vue'
   import {useRoute} from 'vue-router';
