@@ -2,6 +2,7 @@
 using API.Services.Interfaces;
 using Dapper;
 using Microsoft.Data.SqlClient;
+using Microsoft.IdentityModel.Tokens;
 
 namespace API.Storage;
 
@@ -53,6 +54,12 @@ public class ItemService : ICrudService<Items>
 
     public void Create(Items item)
     {
+        if (item.Location.IsNullOrEmpty())
+        {
+            throw new Exception("Location not set");
+            // throw new BadHttpRequestException("Location not set");
+        }
+
         var connection = new  SqlConnection(_connectionString);
         var sql = """
                     INSERT INTO Items (Name, Amount, Location)

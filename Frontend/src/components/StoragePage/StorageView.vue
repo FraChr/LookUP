@@ -54,16 +54,20 @@
 </script>
 
 <template>
-  <div class="flex justify-center items-center">
-    <table class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
-      <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+  <div class="flex justify-center items-center select-none">
+    <table class="w-full text-sm text-left rtl:text-right text-gray-400">
+      <thead class="text-xs  uppercase bg-gray-700 text-gray-400">
         <tr>
-          <th v-for="header in headers" :key="header" class="px-6 py-4">{{header}}</th>
+          <th v-for="header in headers" :key="header" class="px-6 py-4">
+            {{header}}
+          </th>
           <th></th>
         </tr>
       </thead>
       <tbody >
-        <tr v-for="item in items" :key="item.id" class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 border-gray-200">
+        <tr v-for="item in items"
+            :key="item.id"
+            class=" border-b bg-gray-800 border-gray-700">
           <td v-for="header in headers" :key="header" class="px-6 py-4">
             {{item[header]}}
           </td>
@@ -77,12 +81,22 @@
       </tbody>
     </table>
   </div>
-  <div class="flex flex-col items-center mt-4">
+  <div class="flex flex-col items-center mt-4 select-none">
     <div class="flex justify-around w-full mb-2">
-      <button @click="prevPage" :disabled="currentPage === 1" class="disabled:opacity-50 disabled:line-through border-2 rounded-full bg-amber-200 p-2">Previous</button>
-      <button @click="nextPage" :disabled="currentPage === totalPages" class="disabled:opacity-50 disabled:line-through border-2 rounded-full bg-amber-200 p-2">Next</button>
+      <button @click="prevPage"
+              :disabled="currentPage === 1"
+              class="disabled:opacity-50 disabled:line-through border-3 rounded-full
+              border-gray-400 text-gray-400 p-2 hover:text-black hover:border-black">
+        Previous
+      </button>
+      <button @click="nextPage"
+              :disabled="currentPage === totalPages"
+              class="disabled:opacity-50 disabled:line-through border-3 rounded-full
+              border-gray-400 text-gray-400 p-2 hover:text-black hover:border-black">
+        Next
+      </button>
     </div>
-    <span>Page {{currentPage}} of {{totalPages}}</span>
+    <span class="text-gray-400">Page {{currentPage}} of {{totalPages}}</span>
   </div>
 </template>
 

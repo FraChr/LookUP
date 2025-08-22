@@ -15,8 +15,17 @@ public class EndpointMapperService : IEndpointMapper
 
         app.MapPost($"/{route}", (T item, ICrudService<T> storage) =>
         {
-            storage.Create(item);
-            return Results.Ok(storage);
+            try
+            {
+                storage.Create(item);
+                return Results.Ok(storage);
+            }
+            catch (Exception e)
+            {
+                return Results.BadRequest(new {
+                    message = e.Message
+                });
+            }
         });
         //
         // app.MapPut($"/{route}/{{id}}", (int id, ICrudService<T> storage) =>
