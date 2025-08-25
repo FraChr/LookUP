@@ -54,7 +54,7 @@
 </script>
 
 <template>
-  <div class="flex justify-center items-center select-none">
+  <div class="z-40 flex justify-center items-center select-none">
     <table class="w-full text-sm text-left rtl:text-right text-gray-400">
       <thead class="text-xs  uppercase bg-gray-700 text-gray-400">
         <tr>
@@ -64,13 +64,17 @@
           <th></th>
         </tr>
       </thead>
-      <tbody >
+      <tbody>
         <tr v-for="item in items"
             :key="item.id"
             class=" border-b bg-gray-800 border-gray-700">
+
           <td v-for="header in headers" :key="header" class="px-6 py-4">
+            <RouterLink :to="`/storage/${item.id}`">
             {{item[header]}}
+            </RouterLink>
           </td>
+
           <td>
             <button @click="removeItem(item.id)" class="hover:cursor-pointer
             hover:text-white border p-2 rounded-full">

@@ -13,6 +13,11 @@ public class EndpointMapperService : IEndpointMapper
             return storage.GetAll(limit, page);
         });
 
+        app.MapGet($"/{route}/{{id}}", (int id, ICrudService<T> storage) =>
+        {
+            return storage.GetById(id);
+        });
+
         app.MapPost($"/{route}", (T item, ICrudService<T> storage) =>
         {
             try
@@ -27,11 +32,20 @@ public class EndpointMapperService : IEndpointMapper
                 });
             }
         });
-        //
-        // app.MapPut($"/{route}/{{id}}", (int id, ICrudService<T> storage) =>
-        // {
-        //
-        // });
+
+        app.MapPut($"/{route}/{{id}}", (T item, int id, ICrudService<T> storage) =>
+        {
+            try
+            {
+                var updatedItem = storage.Update(item, id);
+                return Results.Ok(updatedItem);
+
+            }
+            catch (Exception e)
+            {
+                return Results.Problem(e.Message, statusCode: 400);
+            }
+        });
 
         app.MapDelete($"/{route}/{{id}}", (int id, ICrudService<T> storage) =>
         {

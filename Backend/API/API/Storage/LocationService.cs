@@ -21,20 +21,12 @@ public class LocationService : ICrudService<Location>
         }
     }
 
-    // public Location[] GetLocations()
-    // {
-    //     var connection = new  SqlConnection(_connectionString);
-    //     var sql = "SELECT * FROM Room";
-    //     var con = connection.Query<Location>(sql).ToArray();
-    //     return con;
-    // }
-
     public PageResult<Location> GetAll(int? limit = null, int? page = null)
     {
         var connection = new  SqlConnection(_connectionString);
         var sql = "SELECT * FROM Room";
         var con = connection.Query<Location>(sql).ToArray();
-        // return con;
+
         return new PageResult<Location>
         {
             Data = con,
@@ -42,7 +34,22 @@ public class LocationService : ICrudService<Location>
         };
     }
 
+    public Location GetById(int id)
+    {
+        throw new NotImplementedException();
+    }
+
     public void Create(Location item)
+    {
+        throw new NotImplementedException();
+    }
+
+    public Location Update(Location item, int id)
+    {
+        throw new NotImplementedException();
+    }
+
+    public Location Update(Location item)
     {
         throw new NotImplementedException();
     }
