@@ -23,7 +23,7 @@ import { addItem, getRooms } from '@/Services/api.js'
     const item = {
       Name: tag.value,
       Amount: Number(amount.value),
-      Location: String(selected.value)
+      LocationId: Number(selected.value)
     };
 
 

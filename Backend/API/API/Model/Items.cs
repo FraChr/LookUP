@@ -9,4 +9,5 @@ public class Items
     public int Amount { get; set; }
     public string Location { get; set; }
     public int LocationId { get; set; }
+
 }

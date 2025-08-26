@@ -31,10 +31,11 @@ public class ItemService : ICrudService<Items>
                   SELECT Items.Id,
                          Items.Name,
                          items.Amount,
-                         Room.Name AS Location
+                         Room.Name AS Location,
+                         Room.Id AS LocationId
                   FROM Items 
                   JOIN Room 
-                  ON Items.Location = Room.Id
+                  ON Items.LocationId = Room.Id
                   ORDER BY Items.id
                   OFFSET @Offset ROWS
                   FETCH NEXT @Limit ROWS ONLY
@@ -65,7 +66,7 @@ public class ItemService : ICrudService<Items>
                   	   
                   FROM Items
                   JOIN Room
-                  ON Items.Location = Room.Id
+                  ON Items.LocationId = Room.Id
                   WHERE Items.Id = @Id
                   """;
         var con = connection.QueryFirstOrDefault<Items>(sql, new { Id = id });
@@ -74,7 +75,7 @@ public class ItemService : ICrudService<Items>
 
     public void Create(Items item)
     {
-        if (item.Location.IsNullOrEmpty())
+        if (item.LocationId == 0)
         {
             throw new Exception("Location not set");
             // throw new BadHttpRequestException("Location not set");
@@ -82,14 +83,14 @@ public class ItemService : ICrudService<Items>
 
         var connection = new  SqlConnection(_connectionString);
         var sql = """
-                    INSERT INTO Items (Name, Amount, Location)
-                    VALUES (@Name, @Amount, @Location)
+                    INSERT INTO Items (Name, Amount, LocationId)
+                    VALUES (@Name, @Amount, @LocationId)
                   """;
         connection.Execute(sql, new
         {
             item.Name,
             item.Amount,
-            item.Location
+            item.LocationId
         });
     }
 
@@ -107,7 +108,7 @@ public class ItemService : ICrudService<Items>
                   SET 
                   Name = @Name,
                   Amount = @Amount,
-                  Location = @Location
+                  LocationId = @LocationId
                   WHERE Id = @Id
                   """;
 
@@ -116,7 +117,7 @@ public class ItemService : ICrudService<Items>
         {
             Name = item.Name,
             Amount = item.Amount,
-            Location = item.Location,
+            LocationId = item.LocationId,
             Id = itemId
         };
 
@@ -128,7 +129,7 @@ public class ItemService : ICrudService<Items>
             throw new Exception("Update failed: item not found");
         };
 
-        return item;
+        return GetById(itemId);
     }
 
     public void Delete(int itemId)
