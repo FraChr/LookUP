@@ -6,9 +6,14 @@ public class EndpointMapperService : IEndpointMapper
 {
     public void MapEndpoints<T>(WebApplication app, string route)
     {
-        app.MapGet($"/{route}", (int? limit, int? page, ICrudService<T> storage) =>
+        app.MapGet($"/{route}", (string? searchTerm, int? limit, int? page, ICrudService<T> storage) =>
         {
             Console.WriteLine($"Limit: {limit}, Page: {page}");
+
+            if (!string.IsNullOrWhiteSpace(searchTerm))
+            {
+                return storage.Search(searchTerm, limit, page);
+            }
 
             return storage.GetAll(limit, page);
         });
@@ -17,6 +22,7 @@ public class EndpointMapperService : IEndpointMapper
         {
             return storage.GetById(id);
         });
+
 
         app.MapPost($"/{route}", (T item, ICrudService<T> storage) =>
         {

@@ -34,6 +34,11 @@ public class LocationService : ICrudService<Location>
         };
     }
 
+    public PageResult<Location> Search(string? searchTerm = null, int? limit = null, int? page = null)
+    {
+        throw new NotImplementedException();
+    }
+
     public Location GetById(int id)
     {
         throw new NotImplementedException();

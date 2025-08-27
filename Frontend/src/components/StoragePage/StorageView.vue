@@ -1,6 +1,8 @@
 <script setup>
   import { ref, onMounted, computed } from 'vue'
   import { getStorage, deleteItem } from '@/Services/api.js'
+  import { useRouter } from 'vue-router'
+  import Search from '@/components/Search.vue'
 
     const items = ref([])
     const headers = ['name', 'amount', 'location']
@@ -8,7 +10,7 @@
     const pageSize = ref(10);
     const total = ref(0);
     const totalPages = computed(() => Math.ceil(total.value / pageSize.value));
-
+    const router = useRouter();
 
 
   const removeItem = async (id) => {
@@ -30,7 +32,6 @@
       });
       items.value = response.data.data;
       total.value = response.data.total;
-      console.log(items.value);
     }catch(error){
       console.error(`Error fetching data ${error}`);
     }
@@ -50,10 +51,15 @@
     }
   }
 
+  const navigate = async (id) => {
+    await router.push({ path: `/storage/${id}` })
+  }
+
   onMounted(() => fetchItems())
 </script>
 
 <template>
+  <Search />
   <div class="z-40 flex justify-center items-center select-none">
     <table class="w-full text-sm text-left rtl:text-right text-gray-400">
       <thead class="text-xs  uppercase bg-gray-700 text-gray-400">
@@ -64,17 +70,17 @@
           <th></th>
         </tr>
       </thead>
+
       <tbody>
         <tr v-for="item in items"
             :key="item.id"
-            class=" border-b bg-gray-800 border-gray-700">
-
-          <td v-for="header in headers" :key="header" class="px-6 py-4">
-            <RouterLink :to="`/storage/${item.id}`">
+            class=" border-b bg-gray-800 border-gray-700 group">
+          <td  v-for="(header, index) in headers"  :key="header"
+               @click="navigate(item.id)"
+               class="px-6 py-4 cursor-pointer group-hover:bg-gray-700 first:group-hover:rounded-l-2xl"
+               :class="[index === headers.length - 1 ? 'group-hover:rounded-r-2xl' : '']">
             {{item[header]}}
-            </RouterLink>
           </td>
-
           <td>
             <button @click="removeItem(item.id)" class="hover:cursor-pointer
             hover:text-white border p-2 rounded-full">

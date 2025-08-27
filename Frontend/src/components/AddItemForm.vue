@@ -27,17 +27,14 @@ import { addItem, getRooms } from '@/Services/api.js'
     };
 
 
-    const response = await addItem(item);
-    console.log(response);
-
-    console.log(`you added: to location: ${selected.value}\nWith Tag: ${tag.value}\nWith Amount: ${amount.value}`);
+    await addItem(item);
 
     selected.value = "";
     tag.value = "";
     amount.value = 0;
 
     }catch(error){
-      console.log("error response: ", error.response.data)
+      console.error("error response: ", error.response.data)
       errorMsg.value =
         error.response?.data?.message ||
         error.message
@@ -54,8 +51,8 @@ import { addItem, getRooms } from '@/Services/api.js'
         <option value="" disabled>Select Room</option>
         <option v-for="room in rooms" :key="room.id" :value="room.id">{{room.name}}</option>
       </select>
-      <input v-model="tag" type="text" placeholder="Item Tag" class="border-2 p-2" />
-      <input v-model="amount" type="number" placeholder="Amount" class="border-2 p-2" />
+      <input v-model="tag" type="text" placeholder="Item Tag" class="border-2 p-2" required/>
+      <input v-model="amount" type="number" placeholder="Amount" class="border-2 p-2"/>
       <div class="flex justify-center">
         <button type="submit"  class="hover:bg-white bg-amber-200 border-2 px-6 py-2">Add</button>
       </div>

@@ -27,10 +27,6 @@ const filteredItemEntries = computed(() => {
   }, {})
 })
 
-watch(numberInputs, (newValue) => {
-  console.log("help", numberInputs.value);
-})
-
 
 
 
@@ -47,10 +43,8 @@ const fetchItems = async () => {
     item.value = itemResponse.data
     roomData.value = roomResponse.data.data
 
-    console.log('item.value: ', item.value)
-    console.log('filteredItemEntries: ', filteredItemEntries.value)
   } catch (error) {
-    console.log('Error fetching item', error)
+    console.error('Error fetching item', error)
   }
 }
 
@@ -65,10 +59,9 @@ const update = async () => {
     }
 
     const response = await updateItem(id, toSend)
-    console.log('response from update: ', response.data)
     item.value = response.data
   } catch (error) {
-    console.log('Error updating item', error.message, '|', error.detail)
+    console.error('Error updating item', error.message, '|', error.detail)
   }
 }
 
@@ -78,7 +71,6 @@ const startEdit = (key) => {
   if(key === "location") {
     tempItem.value['locationId'] = Number(item.value['locationId']);
   }
-  console.log("tempItem: ", tempItem.value);
 }
 
 const cancelEdit = () => {
@@ -87,8 +79,6 @@ const cancelEdit = () => {
 }
 
 const confirmEdit = (key) => {
-  console.log(`Confirmed edit for ${key}: `, item.value[key])
-  console.log('data to send: ', item.value)
   if(key === "location"){
     item.value['locationId'] = Number(tempItem.value['locationId'])
   } else{
@@ -105,27 +95,15 @@ const preventExponential = (event) => {
   }
 }
 
-
-const getRoomNameById = (id) => {
-  console.log('Looking up room name for ID:', id)
-  const room = roomData.value.find((r) => String(r.id) === String(id))
-  return room ? room.name : 'Unknown'
-}
-
 onMounted(() => fetchItems())
 </script>
 
 <template>
   <div class="flex flex-row justify-around">
-    <div class="border 2">
-      {{ item.location }}
-    </div>
-
-    <div class="w-full flex flex-col border-2 space-y-3 rounded-2xl p-2 select-none">
-      <h1 class="underline font-bold text-2xl">{{ item.name }}</h1>
-
-      <div v-for="(value, key) in filteredItemEntries" :key="key" class="flex justify-between ">
-        <span v-if="key !== 'locationId'">{{ key }}:</span>
+    <div class="w-2xl flex flex-col border-2 space-y-3 rounded-2xl p-2 select-none">
+      <h1 class="underline text-center font-bold text-2xl">{{ item.name }}</h1>
+      <div v-for="(value, key) in filteredItemEntries" :key="key" class="flex gap-7">
+        <p v-if="key !== 'locationId'" class="font-bold text-lg">{{ key }}:</p>
 
         <template v-if="editingKey === key">
           <template v-if="editingKey === 'location'">
@@ -152,9 +130,18 @@ onMounted(() => fetchItems())
           </button>
         </template>
 
-        <span v-else @click="startEdit(key)" class="cursor-pointer border-2 rounded-2xl p-2">
-          {{ value }}
-        </span>
+<!--        class="cursor-pointer border-2 rounded-2xl p-2"-->
+<!--        v-else-->
+        <template v-else>
+          <div class="flex justify-between w-full">
+            <p class="mt-0.5">
+              {{ value }}
+            </p>
+            <button @click="startEdit(key)" class="cursor-pointer border-2 rounded-2xl p-2">
+            Edit
+            </button>
+          </div>
+        </template>
       </div>
     </div>
   </div>

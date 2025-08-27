@@ -9,7 +9,7 @@ namespace API.Storage;
 public class ItemService : ICrudService<Items>
 {
     private readonly string _connectionString;
-        // "Data Source=localhost;Database=LookUp;Integrated Security=true;Connect Timeout=30;Encrypt=true;TrustServerCertificate=true;";
+    private const int MaxLimit = 1000;
 
     public ItemService(IConfiguration configuration)
     {
@@ -22,11 +22,11 @@ public class ItemService : ICrudService<Items>
     }
 
 
-    public PageResult<Items> GetAll(int? limit = null, int? page = null)
+    public PageResult<Items> GetAll(int? limit = MaxLimit, int? page = null)
     {
-        var connection = new  SqlConnection(_connectionString);
-        int actualLimit = limit ?? int.MaxValue;
-        int offset = ((page ?? 1) - 1) * actualLimit;
+        using var connection = new  SqlConnection(_connectionString);
+        var actualLimit = limit ?? int.MaxValue;
+        var offset = ((page ?? 1) - 1) * actualLimit;
         var sql = """
                   SELECT Items.Id,
                          Items.Name,
@@ -53,9 +53,59 @@ public class ItemService : ICrudService<Items>
         };
     }
 
+    public PageResult<Items> Search(string? searchTerm = null, int? limit = MaxLimit, int? page = null)
+    {
+        using var connection = new  SqlConnection(_connectionString);
+
+        var parameters = new DynamicParameters();
+        var whereClause = "";
+
+        var actualLimit = limit ?? int.MaxValue;
+        var offset = ((page ?? 1) - 1) * actualLimit;
+
+        parameters.Add("Limit", actualLimit);
+        parameters.Add("Offset", offset);
+
+        if (!string.IsNullOrWhiteSpace(searchTerm))
+        {
+            whereClause = "WHERE Items.Name LIKE @SearchTerm OR Room.Name LIKE @SearchTerm";
+            parameters.Add("SearchTerm", $"%{searchTerm}%");
+        }
+
+
+        var sql = $"""
+                  SELECT Items.Id,
+                         Items.Name,
+                         Items.Amount,
+                         Room.Name AS Location,
+                         Room.Id AS LocationId
+                  FROM Items
+                  JOIN Room ON Items.LocationId = Room.Id
+                  {whereClause}
+                  ORDER BY Items.id
+                  OFFSET @Offset ROWS
+                  FETCH NEXT @Limit ROWS ONLY
+                  """;
+
+        var totalCount = $"""
+                          SELECT COUNT(*) FROM Items
+                          JOIN Room ON Items.LocationId = Room.Id
+                          {whereClause}
+                          """;
+
+        var con = connection.Query<Items>(sql, parameters).ToArray();
+        var total = connection.ExecuteScalar<int>(totalCount, parameters);
+
+        return new PageResult<Items>
+        {
+            Data = con,
+            Total = total,
+        };
+    }
+
     public Items GetById(int id)
     {
-        var connection = new SqlConnection(_connectionString);
+        using var connection = new SqlConnection(_connectionString);
         var sql = """
                   SELECT
                       
@@ -78,7 +128,6 @@ public class ItemService : ICrudService<Items>
         if (item.LocationId == 0)
         {
             throw new Exception("Location not set");
-            // throw new BadHttpRequestException("Location not set");
         }
 
         var connection = new  SqlConnection(_connectionString);
@@ -96,13 +145,7 @@ public class ItemService : ICrudService<Items>
 
     public Items Update(Items item, int itemId)
     {
-        // int roomId;
-        // if (!Enum.TryParse<Rooms>(item.Location, out var room))
-        // {
-        //     throw new Exception("Location not set");
-        // }
-
-        var connection = new SqlConnection(_connectionString);
+        using var connection = new SqlConnection(_connectionString);
         var sql = """
                   UPDATE Items
                   SET 
@@ -134,7 +177,7 @@ public class ItemService : ICrudService<Items>
 
     public void Delete(int itemId)
     {
-        var connection = new  SqlConnection(_connectionString);
+        using var connection = new  SqlConnection(_connectionString);
         var sql = "DELETE FROM Items WHERE Id = @LookUpId";
         var rowsAffected = connection.Execute(sql, new { LookUpId = itemId });
     }
