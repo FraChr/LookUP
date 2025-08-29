@@ -2,19 +2,19 @@
 using API.Services.Interfaces;
 using Dapper;
 using Microsoft.Data.SqlClient;
-using Microsoft.IdentityModel.Tokens;
 
 namespace API.Storage;
 
 public class ItemService : ICrudService<Items>
 {
-    private readonly string _connectionString;
+    private readonly string? _connectionString;
     private const int MaxLimit = 1000;
 
-    public ItemService(IConfiguration configuration)
-    {
-        _connectionString = configuration.GetConnectionString("DefaultConnection");
 
+
+    public ItemService(ConnectionBuilder connectionBuilder)
+    {
+        _connectionString = connectionBuilder.GetConnectionString();
         if (string.IsNullOrWhiteSpace(_connectionString))
         {
             throw new Exception("Connection string not set");
@@ -25,6 +25,7 @@ public class ItemService : ICrudService<Items>
     public PageResult<Items> GetAll(int? limit = MaxLimit, int? page = null)
     {
         using var connection = new  SqlConnection(_connectionString);
+        Console.WriteLine($"CONNECTION STRING {_connectionString}");
         var actualLimit = limit ?? int.MaxValue;
         var offset = ((page ?? 1) - 1) * actualLimit;
         var sql = """
@@ -154,7 +155,6 @@ public class ItemService : ICrudService<Items>
                   LocationId = @LocationId
                   WHERE Id = @Id
                   """;
-
 
         var parameters = new
         {

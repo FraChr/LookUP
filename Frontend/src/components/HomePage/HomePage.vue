@@ -1,6 +1,5 @@
 ﻿<script setup>
-  import AddItemForm from '@/components/AddItemForm.vue'
-
+import AddItemForm from '@/components/AddItemForm.vue';
 </script>
 
 <template>
@@ -9,6 +8,4 @@
   </div>
 </template>
 
-<style>
-
-</style>
+<style></style>

@@ -1,6 +1,8 @@
+using API;
 using API.Extensions;
 using API.Extensions.CorsExtensions;
 using API.Extensions.ServiceExtensions;
+using Microsoft.Data.SqlClient;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -10,10 +12,13 @@ builder.Services.AddOpenApi();
 builder.Services.AddCustomCors();
 builder.Services.AddAppServices();
 
+
 var app = builder.Build();
 
-app.UseCustomCors();
+
 app.UseHttpsRedirection();
+app.UseRouting();
+app.UseCustomCors();
 
 // Configure the HTTP request pipeline.
 // if (app.Environment.IsDevelopment())
