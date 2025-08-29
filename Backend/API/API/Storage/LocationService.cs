@@ -7,14 +7,11 @@ namespace API.Storage;
 
 public class LocationService : ICrudService<Location>
 {
-
     private readonly string _connectionString;
-    //     "Data Source=localhost;Database=LookUp;Integrated Security=true;Connect Timeout=30;Encrypt=true;TrustServerCertificate=true;";
 
-    public LocationService(IConfiguration configuration)
+    public LocationService(ConnectionBuilder connectionBuilder)
     {
-        _connectionString = configuration.GetConnectionString("DefaultConnection");
-
+        _connectionString = connectionBuilder.GetConnectionString();
         if (string.IsNullOrWhiteSpace(_connectionString))
         {
             throw new Exception("Connection string not set");

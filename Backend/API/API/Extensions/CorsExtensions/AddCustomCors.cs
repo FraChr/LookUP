@@ -8,8 +8,8 @@ public static class CorsExtensions
         {
             options.AddPolicy("AllowLocalhost8080",
                 policy =>
-                {
-                    policy.WithOrigins("http://localhost:8080", "http://localhost:5173")
+                { policy.WithOrigins("http://localhost:8080", "http://localhost:5173", "http://localhost:1433", "http://127.0.0.1:8080")
+                    // policy.WithOrigins("http://localhost:8080", "http://localhost:5173")
                         .AllowAnyHeader()
                         .AllowAnyMethod();
                 });
