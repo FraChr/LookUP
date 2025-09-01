@@ -1,15 +1,14 @@
 ﻿<script setup>
-import Header from '@/components/Header.vue'
+import Header from '@/components/Header.vue';
 </script>
 
 <template>
   <div>
-  <Header />
+    <Header />
     <div class="p-8 pt-5">
       <RouterView />
     </div>
   </div>
-
 </template>
 
 <style scoped></style>
