@@ -1,6 +1,6 @@
 <script setup>
-import { ref, onMounted, computed } from 'vue';
-import { getStorage, deleteItem } from '@/Services/api.js';
+import { ref, onMounted } from 'vue';
+import { deleteItem } from '@/Services/api.js';
 import { useRouter } from 'vue-router';
 import Search from '@/components/Search.vue';
 import { useFetch } from '@/composable/fetch.js';
@@ -20,6 +20,7 @@ const { items, currentPage, totalPages, fetchItems } = useFetch();
 
 const handleSearch = async (term) => {
   searchTerm.value = term;
+  currentPage.value = 1;
   await fetchItems(term);
 };
 
@@ -50,17 +51,17 @@ const removeItem = async (id) => {
 // }
 
 const nextPage = async () => {
-  if (currentPage.value < totalPages.value) {
-    currentPage.value++;
-    await fetchItems();
-  }
+  if (currentPage.value >= totalPages.value) return;
+
+  currentPage.value++;
+  await fetchItems(searchTerm.value ? searchTerm.value : undefined);
 };
 
 const prevPage = async () => {
-  if (currentPage.value > 1) {
-    currentPage.value--;
-    await fetchItems();
-  }
+  if (currentPage.value <= 1) return;
+
+  currentPage.value--;
+  await fetchItems(searchTerm.value ? searchTerm.value : undefined);
 };
 
 const navigateToItem = async (id) => {

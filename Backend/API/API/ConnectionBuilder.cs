@@ -5,8 +5,6 @@ namespace API;
 
 public class ConnectionBuilder
 {
-    // private readonly IConfiguration _configuration;
-
     private readonly string _connectionString;
 
     public ConnectionBuilder(IConfiguration configuration)

@@ -1,8 +1,6 @@
-using API;
 using API.Extensions;
 using API.Extensions.CorsExtensions;
 using API.Extensions.ServiceExtensions;
-using Microsoft.Data.SqlClient;
 
 var builder = WebApplication.CreateBuilder(args);
 

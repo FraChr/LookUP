@@ -8,7 +8,7 @@ public class EndpointMapperService : IEndpointMapper
     {
         app.MapGet($"/{route}", (string? searchTerm, int? limit, int? page, ICrudService<T> storage) =>
         {
-            Console.WriteLine($"Limit: {limit}, Page: {page}");
+            Console.WriteLine($"========================\nLimit: {limit}, Page: {page}");
 
             if (!string.IsNullOrWhiteSpace(searchTerm))
             {

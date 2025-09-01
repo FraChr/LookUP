@@ -22,6 +22,8 @@ services:
       - db
     environment:
       - ConnectionStrings__DefaultConnection=Server=db,1433;Database=${DB_NAME};User Id=${DB_USER};Password=${DB_PASSWORD};
+    volumes:
+        - ./backend:/API
     develop:
       watch:
         - action: rebuild
@@ -31,6 +33,7 @@ services:
     image: mcr.microsoft.com/mssql/server:2022-latest
     volumes:
       - db-data:/var/opt/mssql
+      - ./Scripts:/Scripts
     restart: always
     environment:
       ACCEPT_EULA: "Y"

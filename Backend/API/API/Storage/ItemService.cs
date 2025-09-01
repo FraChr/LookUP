@@ -25,7 +25,6 @@ public class ItemService : ICrudService<Items>
     public PageResult<Items> GetAll(int? limit = MaxLimit, int? page = null)
     {
         using var connection = new  SqlConnection(_connectionString);
-        Console.WriteLine($"CONNECTION STRING {_connectionString}");
         var actualLimit = limit ?? int.MaxValue;
         var offset = ((page ?? 1) - 1) * actualLimit;
         var sql = """
@@ -109,12 +108,12 @@ public class ItemService : ICrudService<Items>
         using var connection = new SqlConnection(_connectionString);
         var sql = """
                   SELECT
-                      
+    
                   	   Items.Name,
                   	   Items.Amount,
                   	   Room.Id AS LocationId,
                   	   Room.Name AS Location
-                  	   
+    
                   FROM Items
                   JOIN Room
                   ON Items.LocationId = Room.Id
@@ -168,7 +167,6 @@ public class ItemService : ICrudService<Items>
 
         if(rowsAffected == 0)
         {
-            Console.WriteLine("Update failed: No rows updated. ID may not exist");
             throw new Exception("Update failed: item not found");
         };
 
