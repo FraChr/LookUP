@@ -6,57 +6,14 @@ public class EndpointMapperService : IEndpointMapper
 {
     public void MapEndpoints<T>(WebApplication app, string route)
     {
-        app.MapGet($"/{route}", (string? searchTerm, int? limit, int? page, ICrudService<T> storage) =>
-        {
-            Console.WriteLine($"========================\nLimit: {limit}, Page: {page}");
+        app.MapGet($"/{route}", EndpointHandlers.HandleGet<T>);
 
-            if (!string.IsNullOrWhiteSpace(searchTerm))
-            {
-                return storage.Search(searchTerm, limit, page);
-            }
+        app.MapGet($$"""/{{route}}/{id:int}""", EndpointHandlers.HandleGetById<T>);
 
-            return storage.GetAll(limit, page);
-        });
+        app.MapPost($"/{route}", EndpointHandlers.HandleCreate<T>);
 
-        app.MapGet($"/{route}/{{id}}", (int id, ICrudService<T> storage) =>
-        {
-            return storage.GetById(id);
-        });
+        app.MapPut($$"""/{{route}}/{id:int}""", EndpointHandlers.HandleUpdate<T>);
 
-
-        app.MapPost($"/{route}", (T item, ICrudService<T> storage) =>
-        {
-            try
-            {
-                storage.Create(item);
-                return Results.Ok(storage);
-            }
-            catch (Exception e)
-            {
-                return Results.BadRequest(new {
-                    message = e.Message
-                });
-            }
-        });
-
-        app.MapPut($"/{route}/{{id}}", (T item, int id, ICrudService<T> storage) =>
-        {
-            try
-            {
-                var updatedItem = storage.Update(item, id);
-                return Results.Ok(updatedItem);
-
-            }
-            catch (Exception e)
-            {
-                return Results.Problem(e.Message, statusCode: 400);
-            }
-        });
-
-        app.MapDelete($"/{route}/{{id}}", (int id, ICrudService<T> storage) =>
-        {
-            storage.Delete(id);
-            return Results.NoContent();
-        });
+        app.MapDelete($$"""/{{route}}/{id:int}""", EndpointHandlers.HandleDelete<T>);
     }
 }

@@ -18,46 +18,45 @@ public class LocationService : ICrudService<Location>
         }
     }
 
-    public PageResult<Location> GetAll(int? limit = null, int? page = null)
+    public async Task<PageResult<Location>> GetAll(int? limit = null, int? page = null)
     {
-        var connection = new  SqlConnection(_connectionString);
-        var sql = "SELECT * FROM Room";
-        var con = connection.Query<Location>(sql).ToArray();
+        await using var connection = new  SqlConnection(_connectionString);
+        const string sql = "SELECT * FROM Room";
+        var con = (await connection.QueryAsync<Location>(sql)).ToArray();
 
         return new PageResult<Location>
         {
             Data = con,
-            Total = con.Count(),
+            Total = con.Length,
         };
     }
 
-    public PageResult<Location> Search(string? searchTerm = null, int? limit = null, int? page = null)
+    public async Task<PageResult<Location>> Search(string? searchTerm = null, int? limit = null, int? page = null)
     {
         throw new NotImplementedException();
     }
 
-    public Location GetById(int id)
+    public async Task<Location> GetById(int id)
     {
         throw new NotImplementedException();
     }
 
-    public void Create(Location item)
+    public async Task Create(Location item)
     {
         throw new NotImplementedException();
     }
 
-    public Location Update(Location item, int id)
+    public async Task<Items> Update(Location item, int id)
     {
         throw new NotImplementedException();
     }
 
-    public Location Update(Location item)
+    public async Task<Location> Update(Location item)
     {
         throw new NotImplementedException();
     }
 
-
-    public void Delete(int itemId)
+    public async Task Delete(int itemId)
     {
         throw new NotImplementedException();
     }

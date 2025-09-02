@@ -5,13 +5,7 @@ import { useRouter } from 'vue-router';
 import Search from '@/components/Search.vue';
 import { useFetch } from '@/composable/fetch.js';
 
-// const items = ref([])
 const headers = ['name', 'amount', 'location'];
-
-// const currentPage = ref(1);
-// const pageSize = ref(10);
-// const total = ref(0);
-// const totalPages = computed(() => Math.ceil(total.value / pageSize.value));
 
 const searchTerm = ref('');
 const router = useRouter();
@@ -32,23 +26,6 @@ const removeItem = async (id) => {
     console.error(`Error deleting item: ${error}`);
   }
 };
-
-// const fetchItems = async (search = "") => {
-//   console.log('searchTerm', search)
-//   try{
-//     const response = await getStorage({
-//       params: {
-//         limit: pageSize.value,
-//         page: currentPage.value,
-//         searchTerm: search,
-//       }
-//     });
-//     items.value = response.data.data;
-//     total.value = response.data.total;
-//   }catch(error){
-//     console.error(`Error fetching data ${error}`);
-//   }
-// }
 
 const nextPage = async () => {
   if (currentPage.value >= totalPages.value) return;

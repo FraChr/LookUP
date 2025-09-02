@@ -1,14 +1,13 @@
 <script setup>
-import { ref } from 'vue';
+  import { ref } from 'vue';
 
-const searchTerm = ref('');
+  const searchTerm = ref('');
 
-const emit = defineEmits(['search']);
+  const emit = defineEmits(['search']);
 
-const handleSearch = () => {
-  emit('search', searchTerm.value);
-  console.log('CLICKED BUTTON');
-};
+  const handleSearch = () => {
+    emit('search', searchTerm.value);
+  };
 </script>
 
 <template>

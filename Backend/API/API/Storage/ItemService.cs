@@ -22,9 +22,9 @@ public class ItemService : ICrudService<Items>
     }
 
 
-    public PageResult<Items> GetAll(int? limit = MaxLimit, int? page = null)
+    public async Task<PageResult<Items>> GetAll(int? limit = MaxLimit, int? page = null)
     {
-        using var connection = new  SqlConnection(_connectionString);
+        await using var connection = new  SqlConnection(_connectionString);
         var actualLimit = limit ?? int.MaxValue;
         var offset = ((page ?? 1) - 1) * actualLimit;
         var sql = """
@@ -43,8 +43,8 @@ public class ItemService : ICrudService<Items>
 
         var totalCount = "SELECT COUNT(*) FROM Items";
 
-        var con = connection.Query<Items>(sql, new {Offset = offset, Limit = actualLimit}).ToArray();
-        var total = connection.ExecuteScalar<int>(totalCount);
+        var con = (await connection.QueryAsync<Items>(sql, new { Offset = offset, Limit = actualLimit })).ToArray();
+        var total = await connection.ExecuteScalarAsync<int>(totalCount);
 
         return new PageResult<Items>
         {
@@ -53,9 +53,9 @@ public class ItemService : ICrudService<Items>
         };
     }
 
-    public PageResult<Items> Search(string? searchTerm = null, int? limit = MaxLimit, int? page = null)
+    public async Task<PageResult<Items>> Search(string? searchTerm = null, int? limit = MaxLimit, int? page = null)
     {
-        using var connection = new  SqlConnection(_connectionString);
+        await using var connection = new  SqlConnection(_connectionString);
 
         var parameters = new DynamicParameters();
         var whereClause = "";
@@ -93,8 +93,8 @@ public class ItemService : ICrudService<Items>
                           {whereClause}
                           """;
 
-        var con = connection.Query<Items>(sql, parameters).ToArray();
-        var total = connection.ExecuteScalar<int>(totalCount, parameters);
+        var con = (await connection.QueryAsync<Items>(sql, parameters)).ToArray();
+        var total = await connection.ExecuteScalarAsync<int>(totalCount, parameters);
 
         return new PageResult<Items>
         {
@@ -103,9 +103,9 @@ public class ItemService : ICrudService<Items>
         };
     }
 
-    public Items GetById(int id)
+    public async Task<Items> GetById(int id)
     {
-        using var connection = new SqlConnection(_connectionString);
+        await using var connection = new SqlConnection(_connectionString);
         var sql = """
                   SELECT
     
@@ -119,23 +119,23 @@ public class ItemService : ICrudService<Items>
                   ON Items.LocationId = Room.Id
                   WHERE Items.Id = @Id
                   """;
-        var con = connection.QueryFirstOrDefault<Items>(sql, new { Id = id });
+        var con = await connection.QueryFirstOrDefaultAsync<Items>(sql, new { Id = id });
         return con;
     }
 
-    public void Create(Items item)
+    public async Task Create(Items item)
     {
         if (item.LocationId == 0)
         {
             throw new Exception("Location not set");
         }
 
-        var connection = new  SqlConnection(_connectionString);
+        await using var connection = new  SqlConnection(_connectionString);
         var sql = """
                     INSERT INTO Items (Name, Amount, LocationId)
                     VALUES (@Name, @Amount, @LocationId)
                   """;
-        connection.Execute(sql, new
+        await connection.ExecuteAsync(sql, new
         {
             item.Name,
             item.Amount,
@@ -143,9 +143,9 @@ public class ItemService : ICrudService<Items>
         });
     }
 
-    public Items Update(Items item, int itemId)
+    public async Task<Items> Update(Items item, int itemId)
     {
-        using var connection = new SqlConnection(_connectionString);
+        await using var connection = new SqlConnection(_connectionString);
         var sql = """
                   UPDATE Items
                   SET 
@@ -163,21 +163,21 @@ public class ItemService : ICrudService<Items>
             Id = itemId
         };
 
-        int rowsAffected = connection.Execute(sql, parameters);
+        var rowsAffected = await connection.ExecuteAsync(sql, parameters);
 
         if(rowsAffected == 0)
         {
             throw new Exception("Update failed: item not found");
         };
 
-        return GetById(itemId);
+        return await GetById(itemId);
     }
 
-    public void Delete(int itemId)
+    public async Task Delete(int itemId)
     {
-        using var connection = new  SqlConnection(_connectionString);
+        await using var connection = new  SqlConnection(_connectionString);
         var sql = "DELETE FROM Items WHERE Id = @LookUpId";
-        var rowsAffected = connection.Execute(sql, new { LookUpId = itemId });
+        var rowsAffected = await connection.ExecuteAsync(sql, new { LookUpId = itemId });
     }
 
 
