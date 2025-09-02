@@ -6,7 +6,7 @@ public class EndpointMapperService : IEndpointMapper
 {
     public void MapEndpoints<T>(WebApplication app, string route)
     {
-        app.MapGet($"/{route}", EndpointHandlers.HandleGet<T>);
+        app.MapGet($"/{route}", EndpointHandlers.HandleGetAll<T>);
 
         app.MapGet($$"""/{{route}}/{id:int}""", EndpointHandlers.HandleGetById<T>);
 

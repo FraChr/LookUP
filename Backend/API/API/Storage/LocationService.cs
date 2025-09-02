@@ -46,12 +46,7 @@ public class LocationService : ICrudService<Location>
         throw new NotImplementedException();
     }
 
-    public async Task<Items> Update(Location item, int id)
-    {
-        throw new NotImplementedException();
-    }
-
-    public async Task<Location> Update(Location item)
+    public async Task<Item> Update(Location item, int id)
     {
         throw new NotImplementedException();
     }

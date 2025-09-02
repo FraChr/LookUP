@@ -4,6 +4,7 @@ import { getItemById, getRooms, updateItem } from '@/Services/api.js';
 import { onMounted, ref, computed, watch } from 'vue';
 import { useFetchRooms } from '@/composable/fetchRooms.js';
 import { usePreventExponential } from '@/composable/preventExponential.js';
+import { useCellValue } from '@/composable/CellValue.js';
 
 const { rooms, getRoomsData } = useFetchRooms();
 const { preventExponential } = usePreventExponential();
@@ -60,8 +61,9 @@ const startEdit = (key) => {
   editingKey.value = key;
   tempItem.value[key] = item.value[key];
   if (key === 'location') {
-    tempItem.value['locationId'] = Number(item.value['locationId']);
+    tempItem.value['locationId'] = Number(item.value.location.id);
   }
+  console.log("TEMP ITEM",tempItem.value.locationId);
 };
 
 const cancelEdit = () => {
@@ -80,10 +82,13 @@ const confirmEdit = (key) => {
   tempItem.value = {};
 };
 
+
 onMounted(() => {
   fetchItem();
   getRoomsData();
 });
+const {getCellValue} = useCellValue();
+console.log("filtered", filteredItemEntries);
 </script>
 
 <template>
@@ -134,7 +139,7 @@ onMounted(() => {
         <template v-else>
           <div class="flex justify-between w-full">
             <p class="mt-0.5">
-              {{ value }}
+              {{ getCellValue(filteredItemEntries, key) }}
             </p>
             <button @click="startEdit(key)" class="cursor-pointer border-2 rounded-2xl p-2">
               Edit

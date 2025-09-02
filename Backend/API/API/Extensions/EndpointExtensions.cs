@@ -10,7 +10,7 @@ public static class EndpointExtensions
         using var scope = app.Services.CreateScope();
         var mapper = scope.ServiceProvider.GetRequiredService<EndpointMapperService>();
 
-        mapper.MapEndpoints<Items>(app, "storage");
+        mapper.MapEndpoints<Item>(app, "storage");
         mapper.MapEndpoints<Location>(app, "location");
     }
 }

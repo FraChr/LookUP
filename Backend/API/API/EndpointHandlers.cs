@@ -4,7 +4,7 @@ namespace API;
 
 public static class EndpointHandlers
 {
-    public static async Task<IResult> HandleGet<T>(
+    public static async Task<IResult> HandleGetAll<T>(
         string? searchTerm,
         int? limit,
         int? page,

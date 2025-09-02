@@ -5,7 +5,7 @@ using Microsoft.Data.SqlClient;
 
 namespace API.Storage;
 
-public class ItemService : ICrudService<Items>
+public class ItemService : ICrudService<Item>
 {
     private readonly string? _connectionString;
     private const int MaxLimit = 1000;
@@ -22,7 +22,7 @@ public class ItemService : ICrudService<Items>
     }
 
 
-    public async Task<PageResult<Items>> GetAll(int? limit = MaxLimit, int? page = null)
+    public async Task<PageResult<Item>> GetAll(int? limit = MaxLimit, int? page = null)
     {
         await using var connection = new  SqlConnection(_connectionString);
         var actualLimit = limit ?? int.MaxValue;
@@ -31,11 +31,11 @@ public class ItemService : ICrudService<Items>
                   SELECT Items.Id,
                          Items.Name,
                          items.Amount,
-                         Room.Name AS Location,
-                         Room.Id AS LocationId
+                         Items.LocationId,
+                         Room.Id AS Id,
+                         Room.Name AS Name
                   FROM Items 
-                  JOIN Room 
-                  ON Items.LocationId = Room.Id
+                  JOIN Room ON Items.LocationId = Room.Id
                   ORDER BY Items.id
                   OFFSET @Offset ROWS
                   FETCH NEXT @Limit ROWS ONLY
@@ -43,17 +43,28 @@ public class ItemService : ICrudService<Items>
 
         var totalCount = "SELECT COUNT(*) FROM Items";
 
-        var con = (await connection.QueryAsync<Items>(sql, new { Offset = offset, Limit = actualLimit })).ToArray();
+        var items = (await connection.QueryAsync<Item, Location, Item>(
+            sql,
+            (item, location) =>
+            {
+                item.Location = location;
+                return item;
+            },
+            new {Offset = offset, Limit = actualLimit},
+            splitOn: "Id"
+        )).ToArray();
+
+        // var con = (await connection.QueryAsync<Item>(sql, new { Offset = offset, Limit = actualLimit })).ToArray();
         var total = await connection.ExecuteScalarAsync<int>(totalCount);
 
-        return new PageResult<Items>
+        return new PageResult<Item>
         {
-            Data = con,
+            Data = items,
             Total = total,
         };
     }
 
-    public async Task<PageResult<Items>> Search(string? searchTerm = null, int? limit = MaxLimit, int? page = null)
+    public async Task<PageResult<Item>> Search(string? searchTerm = null, int? limit = MaxLimit, int? page = null)
     {
         await using var connection = new  SqlConnection(_connectionString);
 
@@ -77,8 +88,8 @@ public class ItemService : ICrudService<Items>
                   SELECT Items.Id,
                          Items.Name,
                          Items.Amount,
-                         Room.Name AS Location,
-                         Room.Id AS LocationId
+                         Room.Id AS Id,
+                         Room.Name AS Name
                   FROM Items
                   JOIN Room ON Items.LocationId = Room.Id
                   {whereClause}
@@ -93,37 +104,67 @@ public class ItemService : ICrudService<Items>
                           {whereClause}
                           """;
 
-        var con = (await connection.QueryAsync<Items>(sql, parameters)).ToArray();
+        var items = (await connection.QueryAsync<Item, Location, Item>(
+            sql,
+            (item, location) =>
+            {
+                item.Location = location;
+                return item;
+            },
+            parameters,
+            splitOn: "Id"
+            )).ToArray();
+
+        // var con = (await connection.QueryAsync<Item>(sql, parameters)).ToArray();
         var total = await connection.ExecuteScalarAsync<int>(totalCount, parameters);
 
-        return new PageResult<Items>
+        return new PageResult<Item>
         {
-            Data = con,
+            Data = items,
             Total = total,
         };
     }
 
-    public async Task<Items> GetById(int id)
+    public async Task<Item> GetById(int id)
     {
         await using var connection = new SqlConnection(_connectionString);
         var sql = """
                   SELECT
-    
+                       Items.Id,
                   	   Items.Name,
                   	   Items.Amount,
-                  	   Room.Id AS LocationId,
-                  	   Room.Name AS Location
-    
+                  	   Room.Id AS Id,
+                  	   Room.Name AS Name
                   FROM Items
                   JOIN Room
                   ON Items.LocationId = Room.Id
                   WHERE Items.Id = @Id
                   """;
-        var con = await connection.QueryFirstOrDefaultAsync<Items>(sql, new { Id = id });
-        return con;
+
+        var result = await connection.QueryAsync<Item, Location, Item>(
+            sql,
+            (item, location) =>
+            {
+                item.Location = location;
+                return item;
+            },
+            new { Id = id },
+            splitOn: "Id"
+        );
+
+        var item = result.FirstOrDefault();
+
+        if (item == null)
+        {
+            throw new Exception($"Item with ID {id} not found");
+        }
+        return item;
+
+        // var con = await connection.QueryFirstOrDefaultAsync<Item>(sql, new { Id = id });
+        // return con;
     }
 
-    public async Task Create(Items item)
+    public async Task Create(Item item)
     {
         if (item.LocationId == 0)
         {
@@ -143,7 +184,7 @@ public class ItemService : ICrudService<Items>
         });
     }
 
-    public async Task<Items> Update(Items item, int itemId)
+    public async Task<Item> Update(Item item, int itemId)
     {
         await using var connection = new SqlConnection(_connectionString);
         var sql = """

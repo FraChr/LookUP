@@ -19,6 +19,7 @@ export function useFetch() {
       });
       items.value = response.data.data;
       total.value = response.data.total;
+      console.log(items.value)
     } catch (error) {
       console.error(`Error fetching data ${error}`);
     }

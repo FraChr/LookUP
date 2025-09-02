@@ -12,7 +12,7 @@ public interface ICrudService<T>
 
     Task Create(T item);
 
-    Task<Items> Update(T item, int id);
+    Task<Item> Update(T item, int id);
 
     Task Delete(int itemId);
 }
