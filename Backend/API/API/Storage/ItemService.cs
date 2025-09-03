@@ -133,6 +133,7 @@ public class ItemService : ICrudService<Item>
                        Items.Id,
                   	   Items.Name,
                   	   Items.Amount,
+                  	   Items.LocationId,
                   	   Room.Id AS Id,
                   	   Room.Name AS Name
                   FROM Items

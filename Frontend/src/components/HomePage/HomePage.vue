@@ -1,22 +1,15 @@
 ﻿<script setup>
 import AddItemForm from '@/components/AddItemForm.vue';
+import SignUpFrom from '@/components/SignUp/SignUpFrom.vue';
 </script>
 
 <template>
-
-  <div class="grid grid-rows-3 grid-cols-3">
-    <div>test</div>
-    <div>test</div>
-    <div>test</div>
-    <div>test</div>
-    <div>test</div>
-    <div>test</div>
+  <div class="border-2 border-amber-500 w-full flex justify-center">
+    <SignUpFrom />
   </div>
 
+
   <div class="w-full border-2 border-amber-600 flex justify-center">
-
-
-
     <AddItemForm />
   </div>
 </template>

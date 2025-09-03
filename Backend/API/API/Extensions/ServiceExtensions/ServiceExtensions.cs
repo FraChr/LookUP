@@ -12,6 +12,8 @@ public static class ServiceExtensions
     {
         services.AddScoped<ICrudService<Item>, ItemService>();
         services.AddScoped<ICrudService<Location>, LocationService>();
+        services.AddScoped<ICrudService<User>, UserService>();
+        services.AddScoped<IValidate, Validate>();
         services.AddScoped<EndpointMapperService>();
         services.AddScoped<ConnectionBuilder>();
         return services;

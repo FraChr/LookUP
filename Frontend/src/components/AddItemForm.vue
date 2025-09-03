@@ -33,6 +33,7 @@ const add = async () => {
   }
 };
 
+
 onMounted(() => {
   getRoomsData();
 });
@@ -53,6 +54,8 @@ onMounted(() => {
         placeholder="Amount"
         class="border-2 p-2"
       />
+
+
       <div class="flex justify-center">
         <button type="submit" class="hover:bg-white bg-amber-200 border-2 px-6 py-2">Add</button>
       </div>
