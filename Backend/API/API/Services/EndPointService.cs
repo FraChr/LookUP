@@ -12,6 +12,8 @@ public class EndpointMapperService : IEndpointMapper
 
         app.MapPost($"/{route}", EndpointHandlers.HandleCreate<T>);
 
+        app.MapPost($"/{route}", EndpointHandlers.HandleCreate<T>);
+
         app.MapPut($$"""/{{route}}/{id:int}""", EndpointHandlers.HandleUpdate<T>);
 
         app.MapDelete($$"""/{{route}}/{id:int}""", EndpointHandlers.HandleDelete<T>);

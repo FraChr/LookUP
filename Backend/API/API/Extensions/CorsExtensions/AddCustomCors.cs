@@ -6,10 +6,9 @@ public static class CorsExtensions
     {
         services.AddCors(options =>
         {
-            options.AddPolicy("AllowLocalhost8080",
+            options.AddPolicy("MyAllowSpecificOrigins",
                 policy =>
-                { policy.WithOrigins("http://localhost:8080", "http://localhost:5173", "http://localhost:1433", "http://127.0.0.1:8080")
-                    // policy.WithOrigins("http://localhost:8080", "http://localhost:5173")
+                { policy.WithOrigins("http://localhost:8080", "http://localhost:5173", "http://localhost:1433")
                         .AllowAnyHeader()
                         .AllowAnyMethod();
                 });
@@ -19,7 +18,7 @@ public static class CorsExtensions
 
     public static IApplicationBuilder UseCustomCors(this IApplicationBuilder app)
     {
-        app.UseCors("AllowLocalhost8080");
+        app.UseCors("MyAllowSpecificOrigins");
         return app;
     }
 }

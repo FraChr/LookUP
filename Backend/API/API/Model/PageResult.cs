@@ -1,4 +1,4 @@
-﻿namespace API.Storage;
+﻿namespace API.Model;
 
 public class PageResult<T>
 {
