@@ -2,167 +2,78 @@
 using API.Services.Interfaces;
 using Dapper;
 using Microsoft.Data.SqlClient;
+using Microsoft.EntityFrameworkCore;
 
 namespace API.Storage;
 
 public class ItemService : ICrudService<Item>
 {
-    private readonly string? _connectionString;
+
     private const int MaxLimit = 1000;
+    private readonly AppDbContext _context;
 
 
 
-    public ItemService(ConnectionBuilder connectionBuilder)
+    public ItemService(AppDbContext context)
     {
-        _connectionString = connectionBuilder.GetConnectionString();
-        if (string.IsNullOrWhiteSpace(_connectionString))
-        {
-            throw new Exception("Connection string not set");
-        }
+        _context = context;
     }
 
 
     public async Task<PageResult<Item>> GetAll(int? limit = MaxLimit, int? page = null)
     {
-        await using var connection = new  SqlConnection(_connectionString);
         var actualLimit = limit ?? int.MaxValue;
         var offset = ((page ?? 1) - 1) * actualLimit;
-        var sql = """
-                  SELECT Items.Id,
-                         Items.Name,
-                         items.Amount,
-                         Items.LocationId,
-                         Room.Id AS Id,
-                         Room.Name AS Name
-                  FROM Items 
-                  JOIN Room ON Items.LocationId = Room.Id
-                  ORDER BY Items.id
-                  OFFSET @Offset ROWS
-                  FETCH NEXT @Limit ROWS ONLY
-                  """;
 
-        var totalCount = "SELECT COUNT(*) FROM Items";
+        var query = _context.Items
+            .Include(i => i.Location)
+            .OrderBy(i => i.Id);
 
-        var items = (await connection.QueryAsync<Item, Location, Item>(
-            sql,
-            (item, location) =>
-            {
-                item.Location = location;
-                return item;
-            },
-            new {Offset = offset, Limit = actualLimit},
-            splitOn: "Id"
-        )).ToArray();
+        var total = await query.CountAsync();
+        var data = await query.Skip(offset).Take(actualLimit).ToListAsync();
 
-        // var con = (await connection.QueryAsync<Item>(sql, new { Offset = offset, Limit = actualLimit })).ToArray();
-        var total = await connection.ExecuteScalarAsync<int>(totalCount);
-
-        return new PageResult<Item>
-        {
-            Data = items,
-            Total = total,
-        };
+        return new PageResult<Item> { Data = data, Total = total };
     }
 
     public async Task<PageResult<Item>> Search(string? searchTerm = null, int? limit = MaxLimit, int? page = null)
     {
-        await using var connection = new  SqlConnection(_connectionString);
-
-        var parameters = new DynamicParameters();
-        var whereClause = "";
-
         var actualLimit = limit ?? int.MaxValue;
         var offset = ((page ?? 1) - 1) * actualLimit;
 
-        parameters.Add("Limit", actualLimit);
-        parameters.Add("Offset", offset);
+        var query = _context.Items.Include(i => i.Location).AsQueryable();
 
         if (!string.IsNullOrWhiteSpace(searchTerm))
         {
-            whereClause = "WHERE Items.Name LIKE @SearchTerm OR Room.Name LIKE @SearchTerm";
-            parameters.Add("SearchTerm", $"%{searchTerm}%");
+            query = query.Where(i => i.Name != null && i.Location.Name != null && (i.Name.Contains(searchTerm) || i.Location.Name.Contains(searchTerm)));
         }
-
-
-        var sql = $"""
-                  SELECT Items.Id,
-                         Items.Name,
-                         Items.Amount,
-                         Room.Id AS Id,
-                         Room.Name AS Name
-                  FROM Items
-                  JOIN Room ON Items.LocationId = Room.Id
-                  {whereClause}
-                  ORDER BY Items.id
-                  OFFSET @Offset ROWS
-                  FETCH NEXT @Limit ROWS ONLY
-                  """;
-
-        var totalCount = $"""
-                          SELECT COUNT(*) FROM Items
-                          JOIN Room ON Items.LocationId = Room.Id
-                          {whereClause}
-                          """;
-
-        var items = (await connection.QueryAsync<Item, Location, Item>(
-            sql,
-            (item, location) =>
-            {
-                item.Location = location;
-                return item;
-            },
-            parameters,
-            splitOn: "Id"
-            )).ToArray();
-
-        // var con = (await connection.QueryAsync<Item>(sql, parameters)).ToArray();
-        var total = await connection.ExecuteScalarAsync<int>(totalCount, parameters);
+        var total = await query.CountAsync();
+        var items = await query
+            .OrderBy(i => i.Id)
+            .Skip(offset)
+            .Take(actualLimit)
+            .ToListAsync();
 
         return new PageResult<Item>
         {
             Data = items,
             Total = total,
         };
+
     }
 
     public async Task<Item> GetById(int id)
     {
-        await using var connection = new SqlConnection(_connectionString);
-        var sql = """
-                  SELECT
-                       Items.Id,
-                  	   Items.Name,
-                  	   Items.Amount,
-                  	   Items.LocationId,
-                  	   Room.Id AS Id,
-                  	   Room.Name AS Name
-                  FROM Items
-                  JOIN Room
-                  ON Items.LocationId = Room.Id
-                  WHERE Items.Id = @Id
-                  """;
+        var query = _context.Items
+            .Include(i => i.Location);
 
-        var result = await connection.QueryAsync<Item, Location, Item>(
-            sql,
-            (item, location) =>
-            {
-                item.Location = location;
-                return item;
-            },
-            new { Id = id },
-            splitOn: "Id"
-        );
+        var result = await query.FirstOrDefaultAsync(i => i.Id == id);
 
-        var item = result.FirstOrDefault();
-
-        if (item == null)
+        if (result == null)
         {
             throw new Exception($"Item with ID {id} not found");
         }
-        return item;
 
-        // var con = await connection.QueryFirstOrDefaultAsync<Item>(sql, new { Id = id });
-        // return con;
+        return result;
     }
 
     public async Task Create(Item item)
@@ -172,55 +83,38 @@ public class ItemService : ICrudService<Item>
             throw new Exception("Location not set");
         }
 
-        await using var connection = new  SqlConnection(_connectionString);
-        var sql = """
-                    INSERT INTO Items (Name, Amount, LocationId)
-                    VALUES (@Name, @Amount, @LocationId)
-                  """;
-        await connection.ExecuteAsync(sql, new
-        {
-            item.Name,
-            item.Amount,
-            item.LocationId
-        });
+        await _context.Items.AddAsync(item);
+        await _context.SaveChangesAsync();
     }
 
     public async Task<Item> Update(Item item, int itemId)
     {
-        await using var connection = new SqlConnection(_connectionString);
-        var sql = """
-                  UPDATE Items
-                  SET 
-                  Name = @Name,
-                  Amount = @Amount,
-                  LocationId = @LocationId
-                  WHERE Id = @Id
-                  """;
-
-        var parameters = new
-        {
-            Name = item.Name,
-            Amount = item.Amount,
-            LocationId = item.LocationId,
-            Id = itemId
-        };
-
-        var rowsAffected = await connection.ExecuteAsync(sql, parameters);
-
-        if(rowsAffected == 0)
+        var existingItem = await _context.Items.FirstOrDefaultAsync(i => i.Id == itemId);
+        if (existingItem == null)
         {
             throw new Exception("Update failed: item not found");
-        };
+        }
 
+        existingItem.Name = item.Name;
+        existingItem.Amount = item.Amount;
+        existingItem.LocationId = item.LocationId;
+
+        await _context.SaveChangesAsync();
         return await GetById(itemId);
+
+
+
     }
 
     public async Task Delete(int itemId)
     {
-        await using var connection = new  SqlConnection(_connectionString);
-        var sql = "DELETE FROM Items WHERE Id = @LookUpId";
-        var rowsAffected = await connection.ExecuteAsync(sql, new { LookUpId = itemId });
+        var item = await _context.Items.FirstOrDefaultAsync(i => i.Id == itemId);
+        if (item == null)
+        {
+            throw new Exception("Delete failed: item not found");
+        }
+
+        _context.Items.Remove(item);
+        await _context.SaveChangesAsync();
     }
-
-
 }

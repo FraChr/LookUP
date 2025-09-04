@@ -2,15 +2,20 @@
 using API.Services.Interfaces;
 using Dapper;
 using Microsoft.Data.SqlClient;
+using Microsoft.EntityFrameworkCore;
 
 namespace API.Storage;
 
 public class LocationService : ICrudService<Location>
 {
     private readonly string _connectionString;
+    private readonly AppDbContext _context;
 
-    public LocationService(ConnectionBuilder connectionBuilder)
+    public LocationService(ConnectionBuilder connectionBuilder, AppDbContext context)
     {
+
+        _context = context;
+
         _connectionString = connectionBuilder.GetConnectionString();
         if (string.IsNullOrWhiteSpace(_connectionString))
         {
@@ -20,14 +25,12 @@ public class LocationService : ICrudService<Location>
 
     public async Task<PageResult<Location>> GetAll(int? limit = null, int? page = null)
     {
-        await using var connection = new  SqlConnection(_connectionString);
-        const string sql = "SELECT * FROM Room";
-        var con = (await connection.QueryAsync<Location>(sql)).ToArray();
+        var query = await _context.Room.ToListAsync();
 
         return new PageResult<Location>
         {
-            Data = con,
-            Total = con.Length,
+            Data = query,
+            Total = query.Count(),
         };
     }
 

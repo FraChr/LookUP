@@ -15,5 +15,10 @@ public partial class Validate : IValidate
         {
             throw new Exception("Password must be at least 8 characters long include a special character, number and an uppercase letter");
         }
+
+        if (user.UserName.Length < 5)
+        {
+            throw new Exception("User name must be 5 or more characters");
+        }
     }
 }

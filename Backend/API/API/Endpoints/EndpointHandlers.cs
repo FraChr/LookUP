@@ -14,6 +14,7 @@ public static class EndpointHandlers
         {
             Console.WriteLine($"========================\nLimit: {limit}, Page: {page}");
 
+            Console.WriteLine($"HandleGetAll called with limit={limit}, page={page}, searchTerm={searchTerm}");
             if (!string.IsNullOrWhiteSpace(searchTerm))
             {
                 var result = await storage.Search(searchTerm, limit, page);
@@ -25,6 +26,7 @@ public static class EndpointHandlers
         }
         catch (Exception e)
         {
+            Console.WriteLine("Error in HandleGetAll: " + e.ToString());
             return Results.BadRequest(e.Message);
         }
     }

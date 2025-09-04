@@ -15,6 +15,7 @@ public static class ServiceExtensions
         services.AddScoped<ICrudService<User>, UserService>();
         services.AddScoped<IValidate, Validate>();
         services.AddScoped<EndpointMapperService>();
+
         services.AddScoped<ConnectionBuilder>();
         return services;
     }

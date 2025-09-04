@@ -2,17 +2,21 @@
 using API.Services.Interfaces;
 using Dapper;
 using Microsoft.Data.SqlClient;
+using Microsoft.EntityFrameworkCore;
 
 namespace API.Storage;
 
 public class UserService : ICrudService<User>
 {
 
+    private readonly AppDbContext _context;
     private readonly string? _connectionString;
     private readonly IValidate _validate;
 
-    public UserService(ConnectionBuilder connectionBuilder, IValidate validate)
+    public UserService(ConnectionBuilder connectionBuilder, IValidate validate, AppDbContext context)
     {
+
+        _context = context;
         _validate = validate;
         _connectionString = connectionBuilder.GetConnectionString();
         if (string.IsNullOrEmpty(_connectionString))
@@ -20,11 +24,6 @@ public class UserService : ICrudService<User>
             throw new Exception("ConnectionString not set");
         }
     }
-
-    // public async Task CreateUser(User user)
-    // {
-    //
-    // }
 
     public Task<PageResult<User>> GetAll(int? limit = null, int? page = null)
     {
@@ -43,50 +42,15 @@ public class UserService : ICrudService<User>
 
     public async Task Create(User user)
     {
-
         _validate.ValidateUser(user);
 
-        await using var connection = new SqlConnection(_connectionString);
-
-        var result = CheckUsernameEmail(user);
-
-        if (result != null)
+        var exists = await _context.Users.AnyAsync(u => u.Email == user.Email || u.UserName == user.UserName);
+        if (exists)
         {
             throw new Exception("User already exists");
         }
-
-
-
-        var sql = """
-                    INSERT INTO Users
-                    VALUES(@UserName, @Password, @Email)
-                  """;
-        await connection.ExecuteAsync(sql, new
-        {
-            user.UserName,
-            user.Password,
-            user.Email
-        });
-    }
-
-    private async Task<bool> CheckUsernameEmail(User user)
-    {
-        await using var connection = new SqlConnection(_connectionString);
-        var userExist = """
-                            SELECT TOP 1 UserName, Email 
-                            FROM Users 
-                            WHERE UserName = @UserName 
-                            OR Email = @Email 
-                            
-                        """;
-
-        var result = await connection.QueryFirstOrDefaultAsync(userExist, new
-        {
-            user.UserName,
-            user.Email
-        });
-
-        return result == null;
+        await _context.Users.AddAsync(user);
+        await _context.SaveChangesAsync();
     }
 
     public Task<User> Update(User item, int id)

@@ -21,7 +21,7 @@ export function useFetch() {
       total.value = response.data.total;
       console.log(items.value)
     } catch (error) {
-      console.error(`Error fetching data ${error}`);
+      console.error(`Error fetching data ${error.response.data}`);
     }
   };
 
