@@ -1,7 +1,5 @@
 ﻿using API.Model;
 using API.Services.Interfaces;
-using Dapper;
-using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 
 namespace API.Storage;

@@ -1,7 +1,5 @@
 ﻿using API.Model;
 using API.Services.Interfaces;
-using Dapper;
-using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 
 namespace API.Storage;
@@ -37,7 +35,8 @@ public class UserService : ICrudService<User>
     {
         _validate.ValidateUser(user);
 
-        var exists = await _context.Users.AnyAsync(u => u.Email == user.Email || u.UserName == user.UserName);
+        var exists = await _context.Users
+            .AnyAsync(u => u.Email == user.Email || u.UserName == user.UserName);
         if (exists)
         {
             throw new Exception("User already exists");
