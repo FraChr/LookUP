@@ -10,19 +10,12 @@ public class UserService : ICrudService<User>
 {
 
     private readonly AppDbContext _context;
-    private readonly string? _connectionString;
     private readonly IValidate _validate;
 
-    public UserService(ConnectionBuilder connectionBuilder, IValidate validate, AppDbContext context)
+    public UserService(IValidate validate, AppDbContext context)
     {
-
         _context = context;
         _validate = validate;
-        _connectionString = connectionBuilder.GetConnectionString();
-        if (string.IsNullOrEmpty(_connectionString))
-        {
-            throw new Exception("ConnectionString not set");
-        }
     }
 
     public Task<PageResult<User>> GetAll(int? limit = null, int? page = null)
