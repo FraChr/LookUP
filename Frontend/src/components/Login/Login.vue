@@ -1,8 +1,5 @@
 <script setup>
   import {ref} from 'vue';
-  // import {auth} from '@/firebase.js';
-  // import {signInWithEmailAndPassword} from "firebase/auth";
-  import axios from 'axios';
   import { auth } from '@/Services/api.js';
 
   const email = ref('');
