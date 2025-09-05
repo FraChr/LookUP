@@ -3,16 +3,16 @@ using API.Storage;
 
 namespace API.Services.Interfaces;
 
-public interface ICrudService<T>
+public interface ICrudService<TEntity, TCreateDto, TViewModel>
 {
-    Task<PageResult<T>> GetAll(int? limit = null, int? page = null);
-    Task<PageResult<T>> Search(string? searchTerm = null, int? limit = null, int? page = null);
+    Task<PageResult<TViewModel>> GetAll(int? limit = null, int? page = null);
+    Task<PageResult<TViewModel>> Search(string? searchTerm = null, int? limit = null, int? page = null);
 
-    Task<T> GetById(int id);
+    Task<TViewModel> GetById(int id);
 
-    Task Create(T item);
+    Task Create(TCreateDto dto);
 
-    Task<T> Update(T item, int id);
+    Task<TViewModel> Update(TCreateDto item, int id);
 
-    Task Delete(int itemId);
+    Task Delete(int id);
 }

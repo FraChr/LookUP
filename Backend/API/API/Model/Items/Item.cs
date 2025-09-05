@@ -1,4 +1,4 @@
-﻿namespace API.Model;
+﻿namespace API.Model.Items;
 
 public class Item
 {
@@ -7,6 +7,5 @@ public class Item
     public int Amount { get; set; }
 
     public int LocationId { get; set; }
-    // public string Location { get; set; }
-    public Location Location { get; set; }
+    public Location.Location Location { get; set; }
 }

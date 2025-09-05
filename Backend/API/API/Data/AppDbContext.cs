@@ -1,12 +1,13 @@
 ﻿using API.Model;
+using API.Model.Items;
+using API.Model.Location;
+using API.Model.User;
 using Microsoft.EntityFrameworkCore;
 
-namespace API;
+namespace API.Data;
 
-public class AppDbContext : DbContext
+public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(options)
 {
-    public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) {}
-
     public DbSet<Item> Items { get; set; }
     public DbSet<Location> Room { get; set; }
     public DbSet<User> Users { get; set; }

@@ -1,53 +1,53 @@
-﻿using API.Model;
+﻿using API.Data;
+using API.Model;
+using API.Model.Location;
 using API.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
 namespace API.Storage;
 
-public class LocationService : ICrudService<Location>
+public class LocationService : ICrudService<Location, LocationDto, LocationViewModel>
 {
-    private readonly string _connectionString;
     private readonly AppDbContext _context;
 
-    public LocationService(ConnectionBuilder connectionBuilder, AppDbContext context)
+    public LocationService(AppDbContext context)
     {
-
         _context = context;
-
-        _connectionString = connectionBuilder.GetConnectionString();
-        if (string.IsNullOrWhiteSpace(_connectionString))
-        {
-            throw new Exception("Connection string not set");
-        }
     }
 
-    public async Task<PageResult<Location>> GetAll(int? limit = null, int? page = null)
+    public async Task<PageResult<LocationViewModel>> GetAll(int? limit = null, int? page = null)
     {
         var query = await _context.Room.ToListAsync();
 
-        return new PageResult<Location>
+        var viewModels = query.Select(q => new LocationViewModel
         {
-            Data = query,
+            Id = q.Id,
+            Name = q.Name,
+        });
+
+        return new PageResult<LocationViewModel>
+        {
+            Data = viewModels,
             Total = query.Count(),
         };
     }
 
-    public async Task<PageResult<Location>> Search(string? searchTerm = null, int? limit = null, int? page = null)
+    public async Task<PageResult<LocationViewModel>> Search(string? searchTerm = null, int? limit = null, int? page = null)
     {
         throw new NotImplementedException();
     }
 
-    public async Task<Location> GetById(int id)
+    public async Task<LocationViewModel> GetById(int id)
     {
         throw new NotImplementedException();
     }
 
-    public async Task Create(Location item)
+    public async Task Create(LocationDto dto)
     {
         throw new NotImplementedException();
     }
 
-    public async Task<Location> Update(Location item, int id)
+    public async Task<LocationViewModel> Update(LocationDto dto, int id)
     {
         throw new NotImplementedException();
     }

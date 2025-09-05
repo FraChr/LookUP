@@ -4,7 +4,7 @@ import { getItemById, getRooms, updateItem } from '@/Services/api.js';
 import { onMounted, ref, computed, watch } from 'vue';
 import { useFetchRooms } from '@/composable/fetchRooms.js';
 import { usePreventExponential } from '@/composable/preventExponential.js';
-import { useCellValue } from '@/composable/CellValue.js';
+
 
 const { rooms, getRoomsData } = useFetchRooms();
 const { preventExponential } = usePreventExponential();
@@ -14,7 +14,7 @@ const id = route.params.id;
 const item = ref({});
 const editingKey = ref(null);
 
-const excludeKeys = ['locationId', 'id'];
+const excludeKeys = ['id'];
 
 let tempItem = ref({});
 
@@ -37,6 +37,7 @@ const fetchItem = async () => {
   try {
     const itemResponse = await getItemById(id);
     item.value = itemResponse.data;
+    console.log("Fetched item", item.value);
   } catch (error) {
     console.error('Error fetching item', error);
   }
@@ -59,10 +60,16 @@ const update = async () => {
 
 const startEdit = (key) => {
   editingKey.value = key;
+
+  // if (key === 'location') {
+    const matchRoom = rooms.value.find(room => room.name === item.value.location);
+    tempItem.value['locationId'] = matchRoom?.id ?? null;
+  // }
+
+
   tempItem.value[key] = item.value[key];
-  if (key === 'location') {
-    tempItem.value['locationId'] = Number(item.value.location.id);
-  }
+
+
   console.log("TEMP ITEM",tempItem.value.locationId);
 };
 
@@ -72,11 +79,14 @@ const cancelEdit = () => {
 };
 
 const confirmEdit = (key) => {
-  if (key === 'location') {
+  // if (key === 'location') {
     item.value['locationId'] = Number(tempItem.value['locationId']);
-  } else {
-    item.value[key] = tempItem.value[key];
-  }
+  // }
+
+  item.value[key] = tempItem.value[key];
+
+  console.log("TEMP ITEM",tempItem.value);
+  console.log("Item ", item.value);
   update();
   editingKey.value = null;
   tempItem.value = {};
@@ -87,7 +97,7 @@ onMounted(() => {
   fetchItem();
   getRoomsData();
 });
-const {getCellValue} = useCellValue();
+
 console.log("filtered", filteredItemEntries);
 </script>
 
@@ -139,7 +149,7 @@ console.log("filtered", filteredItemEntries);
         <template v-else>
           <div class="flex justify-between w-full">
             <p class="mt-0.5">
-              {{ getCellValue(filteredItemEntries, key) }}
+              {{ value }}
             </p>
             <button @click="startEdit(key)" class="cursor-pointer border-2 rounded-2xl p-2">
               Edit

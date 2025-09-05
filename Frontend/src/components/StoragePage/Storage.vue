@@ -4,7 +4,6 @@ import { deleteItem } from '@/Services/api.js';
 import { useRouter } from 'vue-router';
 import Search from '@/components/Search.vue';
 import { useFetch } from '@/composable/fetch.js';
-import { useCellValue } from '@/composable/CellValue.js';
 
 const headers = ['name', 'amount', 'location'];
 
@@ -45,13 +44,10 @@ const prevPage = async () => {
 const navigateToItem = async (id) => {
   await router.push({ path: `/storage/${id}` });
 };
-const {getCellValue} = useCellValue();
-// const getCellValue = (item, header) => {
-//   if(header === 'location') return item.location?.name || '';
-//   return item[header];
-// }
+
 
 onMounted(() => fetchItems());
+console.log(`items.value ${items.value}`)
 
 </script>
 
@@ -77,7 +73,7 @@ onMounted(() => fetchItems());
             class="px-6 py-4 cursor-pointer group-hover:bg-gray-700 first:group-hover:rounded-l-2xl"
             :class="[index === headers.length - 1 ? 'group-hover:rounded-r-2xl' : '']"
           >
-            {{ getCellValue(item, header) }}
+            {{ item[header] }}
           </td>
           <td>
             <button

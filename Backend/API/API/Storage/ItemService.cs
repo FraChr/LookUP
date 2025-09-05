@@ -1,10 +1,12 @@
-﻿using API.Model;
+﻿using API.Data;
+using API.Model;
+using API.Model.Items;
 using API.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
 namespace API.Storage;
 
-public class ItemService : ICrudService<Item>
+public class ItemService : ICrudService<Item, ItemDto, ItemViewModel>
 {
 
     private const int MaxLimit = 1000;
@@ -18,7 +20,7 @@ public class ItemService : ICrudService<Item>
     }
 
 
-    public async Task<PageResult<Item>> GetAll(int? limit = MaxLimit, int? page = null)
+    public async Task<PageResult<ItemViewModel>> GetAll(int? limit = MaxLimit, int? page = null)
     {
         var actualLimit = limit ?? int.MaxValue;
         var offset = ((page ?? 1) - 1) * actualLimit;
@@ -28,12 +30,21 @@ public class ItemService : ICrudService<Item>
             .OrderBy(i => i.Id);
 
         var total = await query.CountAsync();
-        var data = await query.Skip(offset).Take(actualLimit).ToListAsync();
+        var items = await query.Skip(offset).Take(actualLimit).ToListAsync();
 
-        return new PageResult<Item> { Data = data, Total = total };
+        var viewModels = items.Select(item => new ItemViewModel
+        {
+            Id = item.Id,
+            Name = item.Name,
+            Amount = item.Amount,
+            // LocationId = item.LocationId,
+            Location = item.Location?.Name ?? "Unknown",
+        });
+
+        return new PageResult<ItemViewModel> { Data = viewModels, Total = total };
     }
 
-    public async Task<PageResult<Item>> Search(string? searchTerm = null, int? limit = MaxLimit, int? page = null)
+    public async Task<PageResult<ItemViewModel>> Search(string? searchTerm = null, int? limit = MaxLimit, int? page = null)
     {
         var actualLimit = limit ?? int.MaxValue;
         var offset = ((page ?? 1) - 1) * actualLimit;
@@ -51,62 +62,83 @@ public class ItemService : ICrudService<Item>
             .Take(actualLimit)
             .ToListAsync();
 
-        return new PageResult<Item>
+        var viewModels = items.Select(item => new ItemViewModel
         {
-            Data = items,
+            Id = item.Id,
+            Name = item.Name,
+            Amount = item.Amount,
+            // LocationId = item.LocationId,
+            Location = item.Location?.Name ?? "Unknown",
+        });
+
+        return new PageResult<ItemViewModel>
+        {
+            Data = viewModels,
             Total = total,
         };
 
     }
 
-    public async Task<Item> GetById(int id)
+    public async Task<ItemViewModel> GetById(int id)
     {
-        var query = _context.Items
-            .Include(i => i.Location);
+        var item = await _context.Items
+            .Include(i => i.Location)
+            .FirstOrDefaultAsync(i => i.Id == id);
 
-        var result = await query.FirstOrDefaultAsync(i => i.Id == id);
-
-        if (result == null)
+        if (item == null)
         {
             throw new Exception($"Item with ID {id} not found");
         }
 
-        return result;
+        return new ItemViewModel
+        {
+            Id = item.Id,
+            Name = item.Name,
+            Amount = item.Amount,
+            // LocationId = item.LocationId,
+            Location = item.Location?.Name ?? "Unknown",
+        };
     }
 
-    public async Task Create(Item item)
+    public async Task Create(ItemDto dto)
     {
-        if (item.LocationId == 0)
+
+        Console.WriteLine($"Create called with: Name={dto.Name}, Amount={dto.Amount}, LocationId={dto.LocationId}");
+        if (dto.LocationId == 0)
         {
             throw new Exception("Location not set");
         }
+
+        var item = new Item
+        {
+            Name = dto.Name,
+            Amount = dto.Amount,
+            LocationId = dto.LocationId
+        };
 
         await _context.Items.AddAsync(item);
         await _context.SaveChangesAsync();
     }
 
-    public async Task<Item> Update(Item item, int itemId)
+    public async Task<ItemViewModel> Update(ItemDto dto, int id)
     {
-        var existingItem = await _context.Items.FirstOrDefaultAsync(i => i.Id == itemId);
+        var existingItem = await _context.Items.FirstOrDefaultAsync(i => i.Id == id);
         if (existingItem == null)
         {
             throw new Exception("Update failed: item not found");
         }
 
-        existingItem.Name = item.Name;
-        existingItem.Amount = item.Amount;
-        existingItem.LocationId = item.LocationId;
+        existingItem.Name = dto.Name;
+        existingItem.Amount = dto.Amount;
+        existingItem.LocationId = dto.LocationId;
 
         await _context.SaveChangesAsync();
-        return await GetById(itemId);
-
-
-
+        return await GetById(id);
     }
 
-    public async Task Delete(int itemId)
+    public async Task Delete(int id)
     {
-        var item = await _context.Items.FirstOrDefaultAsync(i => i.Id == itemId);
+        var item = await _context.Items.FirstOrDefaultAsync(i => i.Id == id);
         if (item == null)
         {
             throw new Exception("Delete failed: item not found");

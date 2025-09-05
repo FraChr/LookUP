@@ -7,6 +7,7 @@ export function useFetchRooms() {
   const getRoomsData = async () => {
     const response = await getRooms();
     rooms.value = response.data.data;
+    console.log("FROM USEFETCHROOMS : ", rooms.value);
   };
 
   return { rooms, getRoomsData };

@@ -1,6 +1,7 @@
 ﻿<script setup>
 import AddItemForm from '@/components/AddItemForm.vue';
 import SignUpFrom from '@/components/SignUp/SignUpFrom.vue';
+import Login from '@/components/Login/Login.vue';
 </script>
 
 <template>
@@ -8,9 +9,12 @@ import SignUpFrom from '@/components/SignUp/SignUpFrom.vue';
     <SignUpFrom />
   </div>
 
+  <div>
+    <Login />
+  </div>
 
   <div class="w-full border-2 border-amber-600 flex justify-center">
-    <AddItemForm />
+<!--    <AddItemForm />-->
   </div>
 </template>
 

@@ -22,6 +22,8 @@ const add = async () => {
       LocationId: Number(selected.value),
     };
 
+    console.log("ITEM ",item);
+
     await addItem(item);
 
     selected.value = '';

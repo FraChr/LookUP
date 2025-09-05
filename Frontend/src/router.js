@@ -1,15 +1,15 @@
 import { createRouter, createWebHistory } from 'vue-router';
 
-import HomePage from './components/HomePage/HomePage.vue';
-import StoragePage from './components/StoragePage/StorageView.vue';
-import UserPage from './components/UserPage/UserView.vue';
-import ItemPage from './components/StoragePage/ItemPage.vue';
+import HomePageView from './View/HomePageView.vue';
+import StorageView from '@/View/StorageView.vue';
+import ItemPageView from '@/View/ItemPageView.vue';
+import ProfileView from '@/View/ProfileView.vue';
 
 const routes = [
-  { path: '/', component: HomePage },
-  { path: '/storage', component: StoragePage },
-  { path: '/user', component: UserPage },
-  { path: '/storage/:id', component: ItemPage },
+  { path: '/', component: HomePageView },
+  { path: '/storage', component: StorageView },
+  { path: '/user', component: ProfileView },
+  { path: '/storage/:id', component: ItemPageView },
 ];
 
 const router = createRouter({

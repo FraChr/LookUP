@@ -1,20 +1,19 @@
-﻿using API.Services.Interfaces;
+﻿using API.Model.User;
+using API.Services.Interfaces;
 
-namespace API;
+namespace API.Endpoints;
 
 public static class EndpointHandlers
 {
-    public static async Task<IResult> HandleGetAll<T>(
+    public static async Task<IResult> HandleGetAll<TEntity, TDto, TViewModel>(
         string? searchTerm,
         int? limit,
         int? page,
-        ICrudService<T> storage)
+        ICrudService<TEntity, TDto, TViewModel> storage)
     {
         try
         {
             Console.WriteLine($"========================\nLimit: {limit}, Page: {page}");
-
-            Console.WriteLine($"HandleGetAll called with limit={limit}, page={page}, searchTerm={searchTerm}");
             if (!string.IsNullOrWhiteSpace(searchTerm))
             {
                 var result = await storage.Search(searchTerm, limit, page);
@@ -26,18 +25,19 @@ public static class EndpointHandlers
         }
         catch (Exception e)
         {
-            Console.WriteLine("Error in HandleGetAll: " + e.ToString());
             return Results.BadRequest(e.Message);
         }
     }
 
-    public static async Task<IResult> HandleGetById<T>(int id, ICrudService<T> storage)
+    public static async Task<IResult> HandleGetById<TEntity, TDto, TViewModel>(int id,
+        ICrudService<TEntity, TDto, TViewModel> storage)
     {
         var result = await storage.GetById(id);
         return Results.Ok(result);
     }
 
-    public static async Task<IResult> HandleCreate<T>(T createdItem, ICrudService<T> storage)
+    public static async Task<IResult> HandleCreate<TEntity, TDto, TViewModel>(TDto createdItem,
+        ICrudService<TEntity, TDto, TViewModel> storage)
     {
         try
         {
@@ -53,13 +53,13 @@ public static class EndpointHandlers
         }
     }
 
-    public static async Task<IResult> HandleUpdate<T>(int id, T modifiedItem, ICrudService<T> storage)
+    public static async Task<IResult> HandleUpdate<TEntity, TDto, TViewModel>(int id, TDto modifiedItem,
+        ICrudService<TEntity, TDto, TViewModel> storage)
     {
         try
         {
             var updatedItem = await storage.Update(modifiedItem, id);
             return Results.Ok(updatedItem);
-
         }
         catch (Exception e)
         {
@@ -67,7 +67,8 @@ public static class EndpointHandlers
         }
     }
 
-    public static async Task<IResult> HandleDelete<T>(int id, ICrudService<T> storage)
+    public static async Task<IResult> HandleDelete<TEntity, TDto, TViewModel>(int id,
+        ICrudService<TEntity, TDto, TViewModel> storage)
     {
         try
         {
@@ -80,4 +81,17 @@ public static class EndpointHandlers
         }
     }
 
+    public static async Task<IResult> HandleLogin(LoginDto loginDto, IAuthService authService)
+    {
+        try
+        {
+            var token = await authService.Login(loginDto);
+            Console.WriteLine($"Token: {token}");
+            return Results.Ok(new {token});
+        }
+        catch(Exception e)
+        {
+            return Results.BadRequest(new {message = e.Message});
+        }
+    }
 }

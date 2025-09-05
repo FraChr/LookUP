@@ -2,5 +2,5 @@
 
 public interface IEndpointMapper
 {
-    void MapEndpoints<T>(WebApplication app, string route);
+    void MapEndpoints<TEntity, TDto, TViewModel>(WebApplication app, string route);
 }
