@@ -1,20 +1,31 @@
 ﻿<script setup>
 import AddItemForm from '@/components/AddItemForm.vue';
-import SignUpFrom from '@/components/SignUp/SignUpFrom.vue';
-import Login from '@/components/Login/Login.vue';
+import { useRouter } from 'vue-router';
+import { computed } from 'vue';
+
+const router = useRouter();
+const hasToken = computed(() => {
+  const token = localStorage.getItem('token');
+  if (token) {
+    return true;
+  }
+  return false;
+});
 </script>
 
 <template>
-  <div class="border-2 border-amber-500 w-full flex justify-center">
-    <SignUpFrom />
-  </div>
-
   <div>
-    <Login />
+    <h1>{{ hasToken ? 'Welcome Username' : 'Welcome to homepage' }}</h1>
+    <button @click="router.push('/signup')" class="hover:bg-white bg-amber-200 border-2 px-6 py-2">
+      Signup
+    </button>
+    <button @click="router.push('/login')" class="hover:bg-white bg-amber-200 border-2 px-6 py-2">
+      Log in
+    </button>
   </div>
 
   <div class="w-full border-2 border-amber-600 flex justify-center">
-<!--    <AddItemForm />-->
+    <AddItemForm />
   </div>
 </template>
 

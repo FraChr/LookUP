@@ -10,13 +10,13 @@ public class EndpointMapperService : IEndpointMapper
     {
         app.MapGet($"/{route}", EndpointHandlers.HandleGetAll<TEntity, TDto, TViewModel>).RequireAuthorization();
 
-        app.MapGet($$"""/{{route}}/{id:int}""", EndpointHandlers.HandleGetById<TEntity, TDto, TViewModel>);
+        app.MapGet($$"""/{{route}}/{id:int}""", EndpointHandlers.HandleGetById<TEntity, TDto, TViewModel>).RequireAuthorization();
 
-        app.MapPost($"/{route}", EndpointHandlers.HandleCreate<TEntity, TDto, TViewModel>);
+        app.MapPost($"/{route}", EndpointHandlers.HandleCreate<TEntity, TDto, TViewModel>).RequireAuthorization();
 
-        app.MapPut($$"""/{{route}}/{id:int}""", EndpointHandlers.HandleUpdate<TEntity, TDto, TViewModel>);
+        app.MapPut($$"""/{{route}}/{id:int}""", EndpointHandlers.HandleUpdate<TEntity, TDto, TViewModel>).RequireAuthorization();
 
-        app.MapDelete($$"""/{{route}}/{id:int}""", EndpointHandlers.HandleDelete<TEntity, TDto, TViewModel>);
+        app.MapDelete($$"""/{{route}}/{id:int}""", EndpointHandlers.HandleDelete<TEntity, TDto, TViewModel>).RequireAuthorization();
     }
 
     public void MapAuthEndpoints(WebApplication app)

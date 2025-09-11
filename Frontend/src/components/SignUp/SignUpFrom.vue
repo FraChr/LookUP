@@ -1,7 +1,9 @@
 <script setup>
   import { ref } from 'vue';
   import { addUser} from '@/Services/api.js';
+  import { useRouter } from 'vue-router';
 
+  const router = useRouter();
   const userInfo = ref({
     userName: '',
     password: '',
@@ -26,6 +28,7 @@
       userInfo.value.password = '';
       userInfo.value.passwordConfirmation = '';
       userInfo.value.email = '';
+      await router.push('/login');
     } catch (error) {
       if(error.response && error.response.data.message) {
         console.error('error response: ', error.response.data.message);

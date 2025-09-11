@@ -1,6 +1,8 @@
-﻿using API.Data;
+﻿using System.Security.Claims;
+using API.Data;
 using API.Model;
 using API.Model.Items;
+using API.Model.User;
 using API.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
@@ -11,21 +13,26 @@ public class ItemService : ICrudService<Item, ItemDto, ItemViewModel>
 
     private const int MaxLimit = 1000;
     private readonly AppDbContext _context;
+    private readonly IUserContextService _userContext;
 
 
 
-    public ItemService(AppDbContext context)
+    public ItemService(AppDbContext context, IUserContextService userContextService)
     {
         _context = context;
+        _userContext = userContextService;
     }
 
 
     public async Task<PageResult<ItemViewModel>> GetAll(int? limit = MaxLimit, int? page = null)
     {
+        var userId = _userContext.GetUserId();
+
         var actualLimit = limit ?? int.MaxValue;
         var offset = ((page ?? 1) - 1) * actualLimit;
 
         var query = _context.Items
+            .Where(i => i.UserId.ToString() == userId )
             .Include(i => i.Location)
             .OrderBy(i => i.Id);
 
@@ -37,7 +44,6 @@ public class ItemService : ICrudService<Item, ItemDto, ItemViewModel>
             Id = item.Id,
             Name = item.Name,
             Amount = item.Amount,
-            // LocationId = item.LocationId,
             Location = item.Location?.Name ?? "Unknown",
         });
 
@@ -46,6 +52,7 @@ public class ItemService : ICrudService<Item, ItemDto, ItemViewModel>
 
     public async Task<PageResult<ItemViewModel>> Search(string? searchTerm = null, int? limit = MaxLimit, int? page = null)
     {
+        var userId = _userContext.GetUserId();
         var actualLimit = limit ?? int.MaxValue;
         var offset = ((page ?? 1) - 1) * actualLimit;
 
@@ -57,6 +64,7 @@ public class ItemService : ICrudService<Item, ItemDto, ItemViewModel>
         }
         var total = await query.CountAsync();
         var items = await query
+            .Where(i => i.UserId.ToString() == userId )
             .OrderBy(i => i.Id)
             .Skip(offset)
             .Take(actualLimit)
@@ -103,6 +111,8 @@ public class ItemService : ICrudService<Item, ItemDto, ItemViewModel>
     public async Task Create(ItemDto dto)
     {
 
+        var userId = _userContext.GetUserId();
+
         Console.WriteLine($"Create called with: Name={dto.Name}, Amount={dto.Amount}, LocationId={dto.LocationId}");
         if (dto.LocationId == 0)
         {
@@ -113,7 +123,8 @@ public class ItemService : ICrudService<Item, ItemDto, ItemViewModel>
         {
             Name = dto.Name,
             Amount = dto.Amount,
-            LocationId = dto.LocationId
+            LocationId = dto.LocationId,
+            UserId = int.Parse(userId)
         };
 
         await _context.Items.AddAsync(item);
@@ -122,7 +133,8 @@ public class ItemService : ICrudService<Item, ItemDto, ItemViewModel>
 
     public async Task<ItemViewModel> Update(ItemDto dto, int id)
     {
-        var existingItem = await _context.Items.FirstOrDefaultAsync(i => i.Id == id);
+        var userId = _userContext.GetUserId();
+        var existingItem = await _context.Items.FirstOrDefaultAsync(i => i.Id == id && userId.ToString() == userId);
         if (existingItem == null)
         {
             throw new Exception("Update failed: item not found");
@@ -138,7 +150,8 @@ public class ItemService : ICrudService<Item, ItemDto, ItemViewModel>
 
     public async Task Delete(int id)
     {
-        var item = await _context.Items.FirstOrDefaultAsync(i => i.Id == id);
+        var userId = _userContext.GetUserId();
+        var item = await _context.Items.FirstOrDefaultAsync(i => i.Id == id && userId.ToString() == userId);
         if (item == null)
         {
             throw new Exception("Delete failed: item not found");

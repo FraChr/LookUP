@@ -3,6 +3,7 @@ using API.Model;
 using API.Model.User;
 using API.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using static BCrypt.Net.BCrypt;
 
 namespace API.Storage;
 
@@ -41,18 +42,19 @@ public class UserService : ICrudService<User, UserDto, UserViewModel>
             _validate.ValidateNewUser(userDto);
 
             var exists = await _context.Users
-                .AnyAsync(u => u.Email == userDto.Email || u.UserName == userDto.UserName);
+                .AnyAsync(u => u.Email == userDto.Email.ToLower() || u.UserName == userDto.UserName.ToLower());
             if (exists)
             {
                 throw new Exception("User already exists");
             }
 
+            var passwordHash = HashPassword(userDto.Password);
 
             var user = new User
             {
-                UserName = userDto.UserName,
-                Email = userDto.Email,
-                HashedPassword = userDto.Password,
+                UserName = userDto.UserName.ToLower(),
+                Email = userDto.Email.ToLower(),
+                HashedPassword = passwordHash,
             };
 
             await _context.Users.AddAsync(user);

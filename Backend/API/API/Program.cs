@@ -11,16 +11,12 @@ using Microsoft.IdentityModel.Tokens;
 var builder = WebApplication.CreateBuilder(args);
 var configuration = builder.Configuration;
 
-// var connectionBuilder = new ConnectionBuilder(configuration);
-
-// builder.Services.AddDbContext<AppDbContext>(options =>
-//     options.UseSqlServer(connectionBuilder.GetConnectionString()));
-
 builder.Services.AddDbContext<AppDbContext>((serviceProvider, options) =>
 {
     var connectionBuilder = serviceProvider.GetRequiredService<ConnectionBuilder>();
     options.UseSqlServer(connectionBuilder.GetConnectionString());
 });
+
 builder.Services.AddAuthentication(options =>
     {
         options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -33,7 +29,9 @@ builder.Services.AddAuthentication(options =>
             ValidateIssuer = true,
             ValidateAudience = true,
             ValidateLifetime = true,
-            
+            ValidIssuer = Environment.GetEnvironmentVariable("JWT_ISSUER"),
+            ValidAudience = Environment.GetEnvironmentVariable("JWT_AUDIENCE"),
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Environment.GetEnvironmentVariable("JWT_KEY")))
         };
     });
 builder.Services.AddAuthorization();

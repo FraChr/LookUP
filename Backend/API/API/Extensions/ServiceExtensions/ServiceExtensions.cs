@@ -21,6 +21,11 @@ public static class ServiceExtensions
 
         services.AddScoped<ConnectionBuilder>();
         services.AddScoped<IAuthService, AuthService>();
+
+        services.AddScoped<IUserContextService, UserContextService>();
+
+        services.AddHttpContextAccessor();
+
         return services;
     }
 }

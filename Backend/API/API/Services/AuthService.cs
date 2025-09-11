@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using System.IdentityModel.Tokens.Jwt;
 using System.Text;
 using Microsoft.IdentityModel.Tokens;
+using static BCrypt.Net.BCrypt;
 
 namespace API.Services;
 
@@ -20,17 +21,15 @@ public class AuthService : IAuthService
 
     public async Task<string> Login(LoginDto loginDto)
     {
-        var user = await _context.Users.FirstOrDefaultAsync(u => u.UserName == loginDto.Identifier || u.Email == loginDto.Identifier);
+        var user = await _context.Users.FirstOrDefaultAsync(u => u.UserName == loginDto.Identifier.ToLower() || u.Email == loginDto.Identifier.ToLower());
 
         if (user == null)
         {
-            Console.WriteLine("LoginDto: User not found");
             throw new Exception("User not found");
         }
 
-        if (user.HashedPassword != loginDto.Password.Trim())
+        if(!Verify(loginDto.Password, user.HashedPassword))
         {
-            Console.WriteLine("Password doesn't match");
             throw new Exception("Wrong password");
         }
 
@@ -51,14 +50,14 @@ public class AuthService : IAuthService
         }
 
         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secret));
-        var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+        var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
         var token = new JwtSecurityToken(
                 issuer,
                 audience,
                 claims,
                 expires: DateTime.Now.AddSeconds(20),
-                signingCredentials: creds
+                signingCredentials: credentials
             );
         return new JwtSecurityTokenHandler().WriteToken(token);
     }

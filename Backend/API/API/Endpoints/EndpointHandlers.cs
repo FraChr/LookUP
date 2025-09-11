@@ -91,7 +91,7 @@ public static class EndpointHandlers
         }
         catch(Exception e)
         {
-            return Results.BadRequest(new {message = e.Message});
+            return Results.Unauthorized();
         }
     }
 }

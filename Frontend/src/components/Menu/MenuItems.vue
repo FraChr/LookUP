@@ -1,4 +1,13 @@
-<script setup lang="ts"></script>
+<script setup>
+  const logout = () => {
+    console.log(`using logout()`);
+    if (localStorage.getItem('token') === null) {
+      return;
+    }
+    localStorage.removeItem('token');
+    window.location.reload();
+  }
+</script>
 
 <template>
   <div>
@@ -7,6 +16,11 @@
         <li class="mb-1"><RouterLink to="/">Home</RouterLink></li>
         <li class="mb-1"><RouterLink to="/storage">Storage</RouterLink></li>
         <li class="mb-1"><RouterLink to="/user">UserPage</RouterLink></li>
+        <li>
+           <button @click="logout" class="hover:bg-white bg-amber-200 border-2 px-6 py-2">
+             Log Out
+           </button>
+        </li>
       </ul>
     </nav>
   </div>
