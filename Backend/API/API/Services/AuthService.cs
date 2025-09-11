@@ -6,7 +6,8 @@ using Microsoft.EntityFrameworkCore;
 using System.IdentityModel.Tokens.Jwt;
 using System.Text;
 using Microsoft.IdentityModel.Tokens;
-using static BCrypt.Net.BCrypt;
+using BCryptHasher = BCrypt.Net.BCrypt;
+
 
 namespace API.Services;
 
@@ -28,7 +29,7 @@ public class AuthService : IAuthService
             throw new Exception("User not found");
         }
 
-        if(!Verify(loginDto.Password, user.HashedPassword))
+        if(!BCryptHasher.Verify(loginDto.Password, user.HashedPassword))
         {
             throw new Exception("Wrong password");
         }
@@ -56,7 +57,7 @@ public class AuthService : IAuthService
                 issuer,
                 audience,
                 claims,
-                expires: DateTime.Now.AddSeconds(20),
+                expires: DateTime.Now.AddMinutes(30),
                 signingCredentials: credentials
             );
         return new JwtSecurityTokenHandler().WriteToken(token);

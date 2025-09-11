@@ -1,5 +1,4 @@
 ﻿using API.Endpoints;
-using API.Model.User;
 using API.Services.Interfaces;
 
 namespace API.Services;
@@ -22,5 +21,10 @@ public class EndpointMapperService : IEndpointMapper
     public void MapAuthEndpoints(WebApplication app)
     {
         app.MapPost("/auth/login", EndpointHandlers.HandleLogin);
+    }
+
+    public void MapSignUpEndpoints(WebApplication app)
+    {
+        app.MapPost("/signup", EndpointHandlers.HandleSignUp);
     }
 }

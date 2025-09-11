@@ -3,7 +3,7 @@ using API.Model;
 using API.Model.User;
 using API.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
-using static BCrypt.Net.BCrypt;
+using BCryptHasher = BCrypt.Net.BCrypt;
 
 namespace API.Storage;
 
@@ -48,7 +48,7 @@ public class UserService : ICrudService<User, UserDto, UserViewModel>
                 throw new Exception("User already exists");
             }
 
-            var passwordHash = HashPassword(userDto.Password);
+            var passwordHash = BCryptHasher.HashPassword(userDto.Password);
 
             var user = new User
             {

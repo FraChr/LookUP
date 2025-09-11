@@ -1,11 +1,15 @@
 <script setup>
+  import { useRouter } from 'vue-router';
+
+  const router = useRouter();
   const logout = () => {
-    console.log(`using logout()`);
     if (localStorage.getItem('token') === null) {
+      router.push('/');
       return;
     }
     localStorage.removeItem('token');
-    window.location.reload();
+    router.push('/');
+    // window.location.reload();
   }
 </script>
 

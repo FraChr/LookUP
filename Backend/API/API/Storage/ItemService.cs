@@ -1,8 +1,6 @@
-﻿using System.Security.Claims;
-using API.Data;
+﻿using API.Data;
 using API.Model;
 using API.Model.Items;
-using API.Model.User;
 using API.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
 

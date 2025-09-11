@@ -94,4 +94,18 @@ public static class EndpointHandlers
             return Results.Unauthorized();
         }
     }
+
+    public static async Task<IResult> HandleSignUp(UserDto userDto, ICrudService<User, UserDto, UserViewModel> userService)
+    {
+        try
+        {
+            await userService.Create(userDto);
+            return Results.Ok(new { message = "User Registration Successful" });
+        }
+        catch (Exception e)
+        {
+            return Results.BadRequest(new { message = e.Message });
+        }
+
+    }
 }
