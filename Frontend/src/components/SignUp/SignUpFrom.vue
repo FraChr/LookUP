@@ -22,8 +22,6 @@
         email: userInfo.value.email,
       }
 
-      console.log("user to be sent to api: ", user);
-
       await addUser(user);
 
       userInfo.value.userName = '';

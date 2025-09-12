@@ -1,17 +1,21 @@
 <script setup>
 import { useRoute } from 'vue-router';
-import { getItemById, getRooms, updateItem } from '@/Services/api.js';
+// import { getItemById, getRooms, updateItem } from '@/Services/api.js';
 import { onMounted, ref, computed, watch } from 'vue';
-import { useFetchRooms } from '@/composable/fetchRooms.js';
-import { usePreventExponential } from '@/composable/preventExponential.js';
+import { useFetchRooms } from '@/composable/useFetchRooms.js';
+import { usePreventExponential } from '@/composable/usePreventExponential.js';
+
+import {fetchFactory} from '@/Services/fetchFactory.js';
 
 
 const { rooms, getRoomsData } = useFetchRooms();
 const { preventExponential } = usePreventExponential();
 
+const {getSingle, item, updateItem} = fetchFactory.useStorage()
+
 const route = useRoute();
 const id = route.params.id;
-const item = ref({});
+
 const editingKey = ref(null);
 
 const excludeKeys = ['id'];
@@ -33,42 +37,25 @@ const filteredItemEntries = computed(() => {
   }, {});
 });
 
-const fetchItem = async () => {
-  try {
-    const itemResponse = await getItemById(id);
-    item.value = itemResponse.data;
-    console.log("Fetched item", item.value);
-  } catch (error) {
-    console.error('Error fetching item', error);
-  }
-};
-
-const update = async () => {
-  try {
+const update = () => {
     const toSend = {
       name: item.value.name,
       amount: item.value.amount,
       locationId: Number(item.value.locationId),
     };
 
-    const response = await updateItem(id, toSend);
-    item.value = response.data;
-  } catch (error) {
-    console.error('Error updating item', error.message, '|', error.detail);
-  }
+    updateItem(id, toSend);
+    console.log("ITEM ", item.value);
+
 };
 
 const startEdit = (key) => {
   editingKey.value = key;
 
-  // if (key === 'location') {
-    const matchRoom = rooms.value.find(room => room.name === item.value.location);
-    tempItem.value['locationId'] = matchRoom?.id ?? null;
-  // }
-
+  const matchRoom = rooms.value.find(room => room.name === item.value.location);
+  tempItem.value['locationId'] = matchRoom?.id ?? null;
 
   tempItem.value[key] = item.value[key];
-
 
   console.log("TEMP ITEM",tempItem.value.locationId);
 };
@@ -79,9 +66,7 @@ const cancelEdit = () => {
 };
 
 const confirmEdit = (key) => {
-  // if (key === 'location') {
-    item.value['locationId'] = Number(tempItem.value['locationId']);
-  // }
+  item.value['locationId'] = Number(tempItem.value['locationId']);
 
   item.value[key] = tempItem.value[key];
 
@@ -94,11 +79,9 @@ const confirmEdit = (key) => {
 
 
 onMounted(() => {
-  fetchItem();
+  getSingle(id);
   getRoomsData();
 });
-
-console.log("filtered", filteredItemEntries);
 </script>
 
 <template>

@@ -1,16 +1,10 @@
 <script setup>
   import { useRouter } from 'vue-router';
+  import { useAccessControl } from '@/composable/useAccsessControl.js';
 
+  const { logout, hasToken } = useAccessControl();
   const router = useRouter();
-  const logout = () => {
-    if (localStorage.getItem('token') === null) {
-      router.push('/');
-      return;
-    }
-    localStorage.removeItem('token');
-    router.push('/');
-    // window.location.reload();
-  }
+
 </script>
 
 <template>
@@ -20,10 +14,20 @@
         <li class="mb-1"><RouterLink to="/">Home</RouterLink></li>
         <li class="mb-1"><RouterLink to="/storage">Storage</RouterLink></li>
         <li class="mb-1"><RouterLink to="/user">UserPage</RouterLink></li>
-        <li>
-           <button @click="logout" class="hover:bg-white bg-amber-200 border-2 px-6 py-2">
-             Log Out
-           </button>
+        <li v-if="!hasToken">
+          <button @click="router.push('/signup')" class="hover:bg-white bg-amber-200 border-2 px-6 py-2">
+            Signup
+          </button>
+        </li>
+        <li v-if="!hasToken">
+          <button @click="router.push('/login')" class="hover:bg-white bg-amber-200 border-2 px-6 py-2">
+            Log in
+          </button>
+        </li>
+        <li v-if="hasToken">
+          <button @click="logout" class="hover:bg-white bg-amber-200 border-2 px-6 py-2">
+            Log Out
+          </button>
         </li>
       </ul>
     </nav>

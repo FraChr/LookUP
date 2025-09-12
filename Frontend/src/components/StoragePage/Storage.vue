@@ -1,53 +1,51 @@
 <script setup>
 import { ref, onMounted } from 'vue';
-import { deleteItem } from '@/Services/api.js';
 import { useRouter } from 'vue-router';
 import Search from '@/components/Search.vue';
-import { useFetch } from '@/composable/fetch.js';
+import {fetchFactory} from '@/Services/fetchFactory.js';
 
 const headers = ['name', 'amount', 'location'];
 
 const searchTerm = ref('');
 const router = useRouter();
 
-const { items, currentPage, totalPages, fetchItems } = useFetch();
+const { items, currentPage, totalPages, getAll, deleteItem } = fetchFactory.useStorage();
 
-const handleSearch = async (term) => {
+const handleSearch =  (term) => {
   searchTerm.value = term;
   currentPage.value = 1;
-  await fetchItems(term);
+  getAll(term);
 };
 
-const removeItem = async (id) => {
+const removeItem = (id) => {
   try {
-    await deleteItem(id);
-    await fetchItems();
+    deleteItem(id);
+    getAll();
   } catch (error) {
     console.error(`Error deleting item: ${error}`);
   }
 };
 
-const nextPage = async () => {
+const nextPage = () => {
   if (currentPage.value >= totalPages.value) return;
 
   currentPage.value++;
-  await fetchItems(searchTerm.value ? searchTerm.value : undefined);
+  getAll(searchTerm.value ? searchTerm.value : undefined);
 };
 
-const prevPage = async () => {
+const prevPage = () => {
   if (currentPage.value <= 1) return;
 
   currentPage.value--;
-  await fetchItems(searchTerm.value ? searchTerm.value : undefined);
+  getAll(searchTerm.value ? searchTerm.value : undefined);
 };
 
-const navigateToItem = async (id) => {
-  await router.push({ path: `/storage/${id}` });
+const navigateToItem = (id) => {
+  router.push({ path: `/storage/${id}` });
 };
 
 
-onMounted(() => fetchItems());
-console.log(`items.value ${items.value}`)
+onMounted(() => getAll());
 
 </script>
 

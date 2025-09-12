@@ -1,9 +1,14 @@
 <script setup>
-import { addItem } from '@/Services/api.js';
+// import { addItem } from '@/Services/api.js';
 import { onMounted, ref } from 'vue';
 
-import { useFetchRooms } from '@/composable/fetchRooms.js';
-import { usePreventExponential } from '@/composable/preventExponential.js';
+import { useFetchRooms } from '@/composable/useFetchRooms.js';
+import { usePreventExponential } from '@/composable/usePreventExponential.js';
+
+import { fetchFactory } from '@/Services/fetchFactory.js';
+
+const { addItem } = fetchFactory.useStorage();
+
 const selected = ref('');
 const tag = ref('');
 const amount = ref(0);
@@ -12,7 +17,7 @@ const errorMsg = ref('');
 const { rooms, getRoomsData } = useFetchRooms();
 const { preventExponential } = usePreventExponential();
 
-const add = async () => {
+const add = () => {
   errorMsg.value = '';
 
   try {
@@ -24,7 +29,7 @@ const add = async () => {
 
     console.log("ITEM ",item);
 
-    await addItem(item);
+     addItem(item);
 
     selected.value = '';
     tag.value = '';
