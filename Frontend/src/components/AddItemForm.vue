@@ -2,19 +2,18 @@
 // import { addItem } from '@/Services/api.js';
 import { onMounted, ref } from 'vue';
 
-import { useFetchRooms } from '@/composable/useFetchRooms.js';
 import { usePreventExponential } from '@/composable/usePreventExponential.js';
 
 import { fetchFactory } from '@/Services/fetchFactory.js';
 
-const { addItem } = fetchFactory.useStorage();
+const storage = fetchFactory.useStorage();
+const location = fetchFactory.useLocation();
 
 const selected = ref('');
 const tag = ref('');
 const amount = ref(0);
 const errorMsg = ref('');
 
-const { rooms, getRoomsData } = useFetchRooms();
 const { preventExponential } = usePreventExponential();
 
 const add = () => {
@@ -29,7 +28,7 @@ const add = () => {
 
     console.log("ITEM ",item);
 
-     addItem(item);
+     storage.addItem(item);
 
     selected.value = '';
     tag.value = '';
@@ -41,8 +40,8 @@ const add = () => {
 };
 
 
-onMounted(() => {
-  getRoomsData();
+onMounted( () => {
+  location.getAll();
 });
 </script>
 
@@ -51,7 +50,7 @@ onMounted(() => {
     <form @submit.prevent="add" class="border-2 w-full max-w-md flex flex-col space-y-3 p-6">
       <select v-model="selected" class="border-2 p-2" required>
         <option value="" disabled>Select Room</option>
-        <option v-for="room in rooms" :key="room.id" :value="room.id">{{ room.name }}</option>
+        <option v-for="room in location.items.value" :key="room.id" :value="room.id">{{ room.name }}</option>
       </select>
       <input v-model="tag" type="text" placeholder="Item Tag" class="border-2 p-2" required />
       <input

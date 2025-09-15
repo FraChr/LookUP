@@ -1,61 +1,52 @@
 <script setup>
 import { useRoute } from 'vue-router';
-// import { getItemById, getRooms, updateItem } from '@/Services/api.js';
-import { onMounted, ref, computed, watch } from 'vue';
-import { useFetchRooms } from '@/composable/useFetchRooms.js';
+import { onMounted, ref, computed } from 'vue';
 import { usePreventExponential } from '@/composable/usePreventExponential.js';
-
 import {fetchFactory} from '@/Services/fetchFactory.js';
 
-
-const { rooms, getRoomsData } = useFetchRooms();
 const { preventExponential } = usePreventExponential();
 
-const {getSingle, item, updateItem} = fetchFactory.useStorage()
+const storage = fetchFactory.useStorage();
+const location = fetchFactory.useLocation();
 
 const route = useRoute();
 const id = route.params.id;
 
 const editingKey = ref(null);
 
-const excludeKeys = ['id'];
-
 let tempItem = ref({});
 
 const numberInputs = computed(() => {
-  return Object.entries(item.value)
+  return Object.entries(storage.item.value)
     .filter(([_, value]) => typeof value === 'number')
     .map(([key]) => key);
 });
 
-const filteredItemEntries = computed(() => {
-  return Object.entries(item.value).reduce((acc, [key, value]) => {
-    if (!excludeKeys.includes(key)) {
-      acc[key] = value;
-    }
-    return acc;
-  }, {});
+const filteredItem = computed(() => {
+  return Object.fromEntries(
+    Object.entries(storage.item.value).filter(([key]) => key !== 'id')
+  )
 });
 
 const update = () => {
     const toSend = {
-      name: item.value.name,
-      amount: item.value.amount,
-      locationId: Number(item.value.locationId),
+      name: storage.item.value.name,
+      amount: storage.item.value.amount,
+      locationId: Number(storage.item.value.locationId),
     };
 
-    updateItem(id, toSend);
-    console.log("ITEM ", item.value);
+  storage.updateItem(id, toSend);
+    console.log("ITEM ", storage.item.value);
 
 };
 
 const startEdit = (key) => {
   editingKey.value = key;
 
-  const matchRoom = rooms.value.find(room => room.name === item.value.location);
+  const matchRoom = location.items.value.find(room => room.name === storage.item.value.location);
   tempItem.value['locationId'] = matchRoom?.id ?? null;
 
-  tempItem.value[key] = item.value[key];
+  tempItem.value[key] = storage.item.value[key];
 
   console.log("TEMP ITEM",tempItem.value.locationId);
 };
@@ -66,12 +57,12 @@ const cancelEdit = () => {
 };
 
 const confirmEdit = (key) => {
-  item.value['locationId'] = Number(tempItem.value['locationId']);
+  storage.item.value['locationId'] = Number(tempItem.value['locationId']);
 
-  item.value[key] = tempItem.value[key];
+  storage.item.value[key] = tempItem.value[key];
 
   console.log("TEMP ITEM",tempItem.value);
-  console.log("Item ", item.value);
+  console.log("Item ", storage.item.value);
   update();
   editingKey.value = null;
   tempItem.value = {};
@@ -79,22 +70,22 @@ const confirmEdit = (key) => {
 
 
 onMounted(() => {
-  getSingle(id);
-  getRoomsData();
+  storage.getSingle(id);
+  location.getAll();
 });
 </script>
 
 <template>
   <div class="flex flex-row justify-around">
     <div class="w-2xl flex flex-col border-2 space-y-3 rounded-2xl p-2 select-none">
-      <h1 class="underline text-center font-bold text-2xl">{{ item.name }}</h1>
-      <div v-for="(value, key) in filteredItemEntries" :key="key" class="flex gap-7">
+      <h1 class="underline text-center font-bold text-2xl">{{ storage.item.name }}</h1>
+      <div v-for="(value, key) in filteredItem" :key="key" class="flex gap-7">
         <p v-if="key !== 'locationId'" class="font-bold text-lg">{{ key }}:</p>
 
         <template v-if="editingKey === key">
           <template v-if="editingKey === 'location'">
             <select v-model="tempItem.locationId" class="border-2 p-2">
-              <option v-for="room in rooms" :key="room.id" :value="room.id">
+              <option v-for="room in location.items.value" :key="room.id" :value="room.id">
                 {{ room.name }}
               </option>
             </select>

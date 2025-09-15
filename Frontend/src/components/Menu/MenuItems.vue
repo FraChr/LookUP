@@ -1,8 +1,9 @@
 <script setup>
   import { useRouter } from 'vue-router';
   import { useAccessControl } from '@/composable/useAccsessControl.js';
+  import {logout} from '@/Services/tokenHandler.js';
 
-  const { logout, hasToken } = useAccessControl();
+  const { hasToken } = useAccessControl();
   const router = useRouter();
 
 </script>

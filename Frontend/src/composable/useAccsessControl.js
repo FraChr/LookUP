@@ -2,6 +2,8 @@ import { auth } from '@/Services/api.js';
 import { useRouter } from 'vue-router';
 import { computed, ref } from 'vue';
 
+import {setLogoutHandler, setTokenHandler} from '@/Services/tokenHandler.js';
+
 export function useAccessControl() {
 
   const router = useRouter();
@@ -9,7 +11,7 @@ export function useAccessControl() {
   const password = ref('');
   let error = ref('');
 
-  const token = computed(() => getToken());
+  const token = ref(getToken());
 
   const hasToken = computed(() => !!token.value);
 
@@ -33,18 +35,23 @@ export function useAccessControl() {
         email.value = '';
         password.value = '';
       }
-      console.log(e.response);
     }
   }
 
-  const logout = () => {
+  async function logout(){
     localStorage.removeItem('token');
-    window.location.href = '/';
+    // await router.push('/');
+    window.location.pathname = '/';
   }
 
-  const getToken = () => {
+  function getToken() {
     return localStorage.getItem('token')
   }
+
+
+
+  setTokenHandler(getToken);
+  setLogoutHandler(logout);
 
   return{
     email,

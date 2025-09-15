@@ -1,4 +1,5 @@
-﻿using System.Text.RegularExpressions;
+﻿using System.Net.Mail;
+using System.Text.RegularExpressions;
 using API.Model.User;
 using API.Services.Interfaces;
 
@@ -26,6 +27,30 @@ public partial class Validate : IValidate
         if (userDto.UserName.Length < 5)
         {
             throw new Exception("User name must be 5 or more characters");
+        }
+
+        if (!IsValidEmail(userDto.Email))
+        {
+            throw new Exception("Invalid email address");
+        }
+    }
+
+    private bool IsValidEmail(string email)
+    {
+        try
+        {
+            if (string.IsNullOrEmpty(email))
+                return false;
+
+            if (email.EndsWith("."))
+                return false;
+
+            var address = new MailAddress(email);
+            return address.Address == email;
+        }
+        catch
+        {
+            return false;
         }
     }
 }

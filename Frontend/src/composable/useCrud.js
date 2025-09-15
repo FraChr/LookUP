@@ -11,6 +11,7 @@ export function useCrud(route) {
   const currentPage = ref(1);
   const pageSize = ref(10);
   const totalPages = computed(() => Math.ceil(total.value / pageSize.value));
+  // const error = ref('');
 
   const getAll = async (searchTerm = null) => {
     try {
@@ -21,8 +22,10 @@ export function useCrud(route) {
           searchTerm: searchTerm,
         },
       });
+
       console.log("response", response.data)
       items.value = response.data.data;
+
       total.value = response.data.total;
       console.log(items.value)
     } catch (error) {

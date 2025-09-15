@@ -1,4 +1,4 @@
-﻿namespace API.Model;
+﻿namespace API.Model.Items;
 
 public class ItemViewModel
 {

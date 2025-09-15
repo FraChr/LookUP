@@ -1,43 +1,46 @@
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, computed } from 'vue';
 import { useRouter } from 'vue-router';
 import Search from '@/components/Search.vue';
 import {fetchFactory} from '@/Services/fetchFactory.js';
 
-const headers = ['name', 'amount', 'location'];
+const headers = computed(() => {
+  const firstItem = storage.items.value[0];
+  return firstItem ? Object.keys(firstItem).filter(key => key !== 'id') : [];
+});
 
 const searchTerm = ref('');
 const router = useRouter();
 
-const { items, currentPage, totalPages, getAll, deleteItem } = fetchFactory.useStorage();
+const storage = fetchFactory.useStorage();
 
 const handleSearch =  (term) => {
   searchTerm.value = term;
-  currentPage.value = 1;
-  getAll(term);
+  storage.currentPage.value = 1;
+  storage.getAll(term);
 };
 
 const removeItem = (id) => {
   try {
-    deleteItem(id);
-    getAll();
+    storage.deleteItem(id);
+    storage.getAll();
   } catch (error) {
     console.error(`Error deleting item: ${error}`);
   }
 };
 
 const nextPage = () => {
-  if (currentPage.value >= totalPages.value) return;
+  if (storage.currentPage.value >= storage.totalPages.value) return;
 
-  currentPage.value++;
-  getAll(searchTerm.value ? searchTerm.value : undefined);
+  storage.currentPage.value++;
+  storage.getAll(searchTerm.value ? searchTerm.value : undefined);
 };
 
 const prevPage = () => {
-  if (currentPage.value <= 1) return;
+  if (storage.currentPage.value <= 1) return;
 
-  currentPage.value--;
-  getAll(searchTerm.value ? searchTerm.value : undefined);
+  storage.currentPage.value--;
+  storage.getAll(searchTerm.value ? searchTerm.value : undefined);
 };
 
 const navigateToItem = (id) => {
@@ -45,7 +48,7 @@ const navigateToItem = (id) => {
 };
 
 
-onMounted(() => getAll());
+onMounted(() => storage.getAll());
 
 </script>
 
@@ -63,7 +66,7 @@ onMounted(() => getAll());
       </thead>
 
       <tbody>
-        <tr v-for="item in items" :key="item.id" class="border-b bg-gray-800 border-gray-700 group">
+        <tr v-for="item in storage.items.value" :key="item.id" class="border-b bg-gray-800 border-gray-700 group">
           <td
             v-for="(header, index) in headers"
             :key="header"
@@ -89,20 +92,20 @@ onMounted(() => getAll());
     <div class="flex justify-around w-full mb-2">
       <button
         @click="prevPage"
-        :disabled="currentPage === 1"
+        :disabled="storage.currentPage.value === 1"
         class="disabled:opacity-50 disabled:line-through border-3 rounded-full border-gray-400 text-gray-400 p-2 hover:text-black hover:border-black"
       >
         Previous
       </button>
       <button
         @click="nextPage"
-        :disabled="currentPage === totalPages"
+        :disabled="storage.currentPage.value === storage.totalPages.value"
         class="disabled:opacity-50 disabled:line-through border-3 rounded-full border-gray-400 text-gray-400 p-2 hover:text-black hover:border-black"
       >
         Next
       </button>
     </div>
-    <span class="text-gray-400">Page {{ currentPage }} of {{ totalPages }}</span>
+    <span class="text-gray-400">Page {{ storage.currentPage.value }} of {{ storage.totalPages.value }}</span>
   </div>
 </template>
 

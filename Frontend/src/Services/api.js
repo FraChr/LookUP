@@ -1,9 +1,11 @@
 import axios from 'axios';
 import { useJwtClaims } from '@/composable/useJwtClaims.js';
-import { useAccessControl } from '@/composable/useAccsessControl.js';
+// import { useAccessControl } from '@/composable/useAccsessControl.js';
+
+import {getToken, logout} from './tokenHandler.js'
 
 const { tokenExpiry } = useJwtClaims();
-const { logout, getToken } = useAccessControl()
+// const { logout, getToken } = useAccessControl()
 
 const apiClient = axios.create({
   baseURL: 'http://localhost:5000',
@@ -49,8 +51,9 @@ export const storageService = createCrudService('storage');
 // export const deleteItem = (id) => apiClient.delete(`/storage/${id}`);
 
 // export const updateItem = (id, item) => apiClient.put(`/storage/${id}`, item);
+
+
+// export const getRooms = () => apiClient.get('/location');
+
 export const addUser = (user) => apiClient.post(`/signup`, user);
-
-export const getRooms = () => apiClient.get('/location');
-
 export const auth = (credentials) => apiClient.post('/auth/login', credentials);
