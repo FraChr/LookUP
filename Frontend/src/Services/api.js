@@ -1,11 +1,9 @@
 import axios from 'axios';
 import { useJwtClaims } from '@/composable/useJwtClaims.js';
-// import { useAccessControl } from '@/composable/useAccsessControl.js';
-
 import {getToken, logout} from './tokenHandler.js'
 
 const { tokenExpiry } = useJwtClaims();
-// const { logout, getToken } = useAccessControl()
+
 
 const apiClient = axios.create({
   baseURL: 'http://localhost:5000',

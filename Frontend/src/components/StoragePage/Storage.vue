@@ -3,6 +3,9 @@ import { ref, onMounted, computed } from 'vue';
 import { useRouter } from 'vue-router';
 import Search from '@/components/Search.vue';
 import {fetchFactory} from '@/Services/fetchFactory.js';
+import {useDateFormat} from '@/composable/useDateFormat.js';
+
+
 
 const headers = computed(() => {
   const firstItem = storage.items.value[0];
@@ -13,6 +16,10 @@ const searchTerm = ref('');
 const router = useRouter();
 
 const storage = fetchFactory.useStorage();
+
+const displayDate = computed(() => {
+  return storage.items.value.map(item => useDateFormat(ref(item)))
+})
 
 const handleSearch =  (term) => {
   searchTerm.value = term;
@@ -74,7 +81,7 @@ onMounted(() => storage.getAll());
             class="px-6 py-4 cursor-pointer group-hover:bg-gray-700 first:group-hover:rounded-l-2xl"
             :class="[index === headers.length - 1 ? 'group-hover:rounded-r-2xl' : '']"
           >
-            {{ item[header] }}
+            {{ header === 'timestamp' ? useDateFormat(item[header]) : item[header] }}
           </td>
           <td>
             <button

@@ -37,12 +37,14 @@ public class ItemService : ICrudService<Item, ItemDto, ItemViewModel>
         var total = await query.CountAsync();
         var items = await query.Skip(offset).Take(actualLimit).ToListAsync();
 
-        var viewModels = items.Select(item => new ItemViewModel
+        var viewModels = items .Select(item => new ItemViewModel
         {
             Id = item.Id,
-            Name = item.Name,
+            Name = item?.Name ?? "Unknown",
             Amount = item.Amount,
             Location = item.Location?.Name ?? "Unknown",
+            Shelf = item?.Shelf ?? "Unknown",
+            Timestamp = item.Timestamp
         });
 
         return new PageResult<ItemViewModel> { Data = viewModels, Total = total };
@@ -73,8 +75,9 @@ public class ItemService : ICrudService<Item, ItemDto, ItemViewModel>
             Id = item.Id,
             Name = item.Name,
             Amount = item.Amount,
-            // LocationId = item.LocationId,
             Location = item.Location?.Name ?? "Unknown",
+            Shelf = item?.Shelf ?? "Unknown",
+            Timestamp = item.Timestamp
         });
 
         return new PageResult<ItemViewModel>
@@ -101,8 +104,9 @@ public class ItemService : ICrudService<Item, ItemDto, ItemViewModel>
             Id = item.Id,
             Name = item.Name,
             Amount = item.Amount,
-            // LocationId = item.LocationId,
             Location = item.Location?.Name ?? "Unknown",
+            Shelf = item?.Shelf ?? "Unknown",
+            Timestamp = item.Timestamp
         };
     }
 
@@ -122,7 +126,9 @@ public class ItemService : ICrudService<Item, ItemDto, ItemViewModel>
             Name = dto.Name,
             Amount = dto.Amount,
             LocationId = dto.LocationId,
-            UserId = int.Parse(userId)
+            UserId = int.Parse(userId),
+            Shelf = dto.Shelf,
+            Timestamp = DateOnly.FromDateTime(DateTime.Now)
         };
 
         await _context.Items.AddAsync(item);
@@ -141,6 +147,7 @@ public class ItemService : ICrudService<Item, ItemDto, ItemViewModel>
         existingItem.Name = dto.Name;
         existingItem.Amount = dto.Amount;
         existingItem.LocationId = dto.LocationId;
+        existingItem.Shelf = dto.Shelf;
 
         await _context.SaveChangesAsync();
         return await GetById(id);

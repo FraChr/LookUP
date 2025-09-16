@@ -1,8 +1,10 @@
 <script setup>
 import { useRoute } from 'vue-router';
-import { onMounted, ref, computed } from 'vue';
+import { onMounted, ref, computed, watch } from 'vue';
 import { usePreventExponential } from '@/composable/usePreventExponential.js';
 import {fetchFactory} from '@/Services/fetchFactory.js';
+import { useExcludeKeys } from '@/composable/useExcludeKeys.js';
+import { useDateFormat } from '@/composable/useDateFormat.js';
 
 const { preventExponential } = usePreventExponential();
 
@@ -22,11 +24,19 @@ const numberInputs = computed(() => {
     .map(([key]) => key);
 });
 
-const filteredItem = computed(() => {
-  return Object.fromEntries(
-    Object.entries(storage.item.value).filter(([key]) => key !== 'id')
-  )
-});
+
+
+
+// const displayDate = useDateFormat(storage.item.value.timestamp);
+const filteredItem = useExcludeKeys(storage.item, ['id']);
+const editable = useExcludeKeys(filteredItem, ['timestamp']);
+
+
+// watch(displayDate, (newVal) => {
+//   console.log("DATE: ", newVal);
+// })
+
+
 
 const update = () => {
     const toSend = {
@@ -68,7 +78,6 @@ const confirmEdit = (key) => {
   tempItem.value = {};
 };
 
-
 onMounted(() => {
   storage.getSingle(id);
   location.getAll();
@@ -80,9 +89,9 @@ onMounted(() => {
     <div class="w-2xl flex flex-col border-2 space-y-3 rounded-2xl p-2 select-none">
       <h1 class="underline text-center font-bold text-2xl">{{ storage.item.name }}</h1>
       <div v-for="(value, key) in filteredItem" :key="key" class="flex gap-7">
-        <p v-if="key !== 'locationId'" class="font-bold text-lg">{{ key }}:</p>
+        <p v-if="key !== 'locationId'" class="font-bold text-lg">{{ key.charAt(0).toUpperCase() + key.slice(1) }}:</p>
 
-        <template v-if="editingKey === key">
+        <template v-if="editingKey === key && key !== 'timestamp'">
           <template v-if="editingKey === 'location'">
             <select v-model="tempItem.locationId" class="border-2 p-2">
               <option v-for="room in location.items.value" :key="room.id" :value="room.id">
@@ -123,9 +132,9 @@ onMounted(() => {
         <template v-else>
           <div class="flex justify-between w-full">
             <p class="mt-0.5">
-              {{ value }}
+              {{ key === 'timestamp' ? useDateFormat(value) : value }}
             </p>
-            <button @click="startEdit(key)" class="cursor-pointer border-2 rounded-2xl p-2">
+            <button v-if="Object.keys(editable).includes(key)" @click="startEdit(key)" class="cursor-pointer border-2 rounded-2xl p-2">
               Edit
             </button>
           </div>
