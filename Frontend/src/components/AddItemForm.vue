@@ -5,11 +5,14 @@ import { onMounted, ref } from 'vue';
 import { usePreventExponential } from '@/composable/usePreventExponential.js';
 
 import { fetchFactory } from '@/Services/fetchFactory.js';
+import Select from '@/Select.vue';
 
 const storage = fetchFactory.useStorage();
 const location = fetchFactory.useLocation();
+const shelfs = fetchFactory.useShelfs();
 
-const selected = ref('');
+const selectedRoom = ref('');
+const selectedShelf = ref('');
 const tag = ref('');
 const amount = ref(0);
 const errorMsg = ref('');
@@ -23,14 +26,15 @@ const add = () => {
     const item = {
       Name: tag.value,
       Amount: Number(amount.value),
-      LocationId: Number(selected.value),
+      LocationId: Number(selectedRoom.value),
+      ShelfId: Number(selectedShelf.value),
     };
 
     console.log("ITEM ",item);
 
      storage.addItem(item);
 
-    selected.value = '';
+    selectedRoom.value = '';
     tag.value = '';
     amount.value = 0;
   } catch (error) {
@@ -42,16 +46,19 @@ const add = () => {
 
 onMounted( () => {
   location.getAll();
+  shelfs.getAll();
 });
 </script>
 
 <template>
   <div class="w-full flex flex-col items-center m-4">
     <form @submit.prevent="add" class="border-2 w-full max-w-md flex flex-col space-y-3 p-6">
-      <select v-model="selected" class="border-2 p-2" required>
-        <option value="" disabled>Select Room</option>
-        <option v-for="room in location.items.value" :key="room.id" :value="room.id">{{ room.name }}</option>
-      </select>
+<!--      <select v-model="selected" class="border-2 p-2" required>-->
+<!--        <option value="" disabled>Select Room</option>-->
+<!--        <option v-for="room in location.items.value" :key="room.id" :value="room.id">{{ room.name }}</option>-->
+<!--      </select>-->
+      <Select v-model="selectedRoom" :options="location.items.value" :defaultOption="true" :defaultOptionValue="'Select Room'" />
+      <Select v-model="selectedShelf" :options="shelfs.items.value" :defaultOption="true" :defaultOptionValue="'Select Shelf'" />
       <input v-model="tag" type="text" placeholder="Item Tag" class="border-2 p-2" required />
       <input
         v-model="amount"

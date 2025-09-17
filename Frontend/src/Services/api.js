@@ -41,9 +41,6 @@ export const createCrudService = (route) => ({
 });
 
 
-export const storageService = createCrudService('storage');
-
-
 // export const getStorage = (params = {}) => apiClient.get('/storage', params);
 // export const getItemById = (id) => apiClient.get(`/storage/${id}`);
 // export const deleteItem = (id) => apiClient.delete(`/storage/${id}`);

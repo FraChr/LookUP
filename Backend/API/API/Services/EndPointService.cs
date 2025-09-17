@@ -18,6 +18,11 @@ public class EndpointMapperService : IEndpointMapper
         app.MapDelete($$"""/{{route}}/{id:int}""", EndpointHandlers.HandleDelete<TEntity, TDto, TViewModel>).RequireAuthorization();
     }
 
+    public void MapEndpoints<TEntity>(WebApplication app, string route)
+    {
+        MapEndpoints<TEntity, TEntity, TEntity>(app, route);
+    }
+
     public void MapAuthEndpoints(WebApplication app)
     {
         app.MapPost("/auth/login", EndpointHandlers.HandleLogin);

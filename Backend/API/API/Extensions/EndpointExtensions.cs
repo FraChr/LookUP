@@ -1,6 +1,7 @@
 ﻿using API.Model;
 using API.Model.Items;
 using API.Model.Location;
+using API.Model.Shelf;
 using API.Model.User;
 using API.Services;
 
@@ -16,6 +17,9 @@ public static class EndpointExtensions
         mapper.MapEndpoints<Item, ItemDto, ItemViewModel>(app, "storage");
         mapper.MapEndpoints<Location, LocationDto, LocationViewModel>(app, "location");
         mapper.MapEndpoints<User, UserDto, UserViewModel>(app, "user");
+
+        mapper.MapEndpoints<Shelfs, ShelfsDto, ShelfsViewModel>(app, "shelfs");
+
         mapper.MapAuthEndpoints(app);
         mapper.MapSignUpEndpoints(app);
     }

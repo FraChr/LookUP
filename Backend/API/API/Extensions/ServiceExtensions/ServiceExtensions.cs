@@ -1,6 +1,7 @@
 ﻿using API.Model;
 using API.Model.Items;
 using API.Model.Location;
+using API.Model.Shelf;
 using API.Model.User;
 using API.Services;
 using API.Services.Interfaces;
@@ -16,6 +17,9 @@ public static class ServiceExtensions
         services.AddScoped<ICrudService<Item, ItemDto, ItemViewModel>, ItemService>();
         services.AddScoped<ICrudService<Location, LocationDto, LocationViewModel>, LocationService>();
         services.AddScoped<ICrudService<User, UserDto, UserViewModel>, UserService>();
+
+        services.AddScoped<ICrudService<Shelfs, ShelfsDto, ShelfsViewModel>, ShelfsService>();
+
         services.AddScoped<IValidate, Validate>();
         services.AddScoped<EndpointMapperService>();
 

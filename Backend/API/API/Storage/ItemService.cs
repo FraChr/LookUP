@@ -30,8 +30,9 @@ public class ItemService : ICrudService<Item, ItemDto, ItemViewModel>
         var offset = ((page ?? 1) - 1) * actualLimit;
 
         var query = _context.Items
-            .Where(i => i.UserId.ToString() == userId )
+            .Where(i => i.UserId == userId )
             .Include(i => i.Location)
+            .Include(i => i.Shelfs)
             .OrderBy(i => i.Id);
 
         var total = await query.CountAsync();
@@ -43,7 +44,8 @@ public class ItemService : ICrudService<Item, ItemDto, ItemViewModel>
             Name = item?.Name ?? "Unknown",
             Amount = item.Amount,
             Location = item.Location?.Name ?? "Unknown",
-            Shelf = item?.Shelf ?? "Unknown",
+            LocationId = item.LocationId,
+            Shelf = item.Shelfs?.Name ?? "Unknown",
             Timestamp = item.Timestamp
         });
 
@@ -56,15 +58,19 @@ public class ItemService : ICrudService<Item, ItemDto, ItemViewModel>
         var actualLimit = limit ?? int.MaxValue;
         var offset = ((page ?? 1) - 1) * actualLimit;
 
-        var query = _context.Items.Include(i => i.Location).AsQueryable();
+        var query = _context.Items
+            .Include(i => i.Location)
+            .Include(i => i.Shelfs)
+            .AsQueryable();
 
         if (!string.IsNullOrWhiteSpace(searchTerm))
         {
             query = query.Where(i => i.Name != null && i.Location.Name != null && (i.Name.Contains(searchTerm) || i.Location.Name.Contains(searchTerm)));
+
         }
         var total = await query.CountAsync();
         var items = await query
-            .Where(i => i.UserId.ToString() == userId )
+            .Where(i => i.UserId == userId )
             .OrderBy(i => i.Id)
             .Skip(offset)
             .Take(actualLimit)
@@ -76,7 +82,7 @@ public class ItemService : ICrudService<Item, ItemDto, ItemViewModel>
             Name = item.Name,
             Amount = item.Amount,
             Location = item.Location?.Name ?? "Unknown",
-            Shelf = item?.Shelf ?? "Unknown",
+            Shelf = item.Shelfs?.Name ?? "Unknown",
             Timestamp = item.Timestamp
         });
 
@@ -92,6 +98,7 @@ public class ItemService : ICrudService<Item, ItemDto, ItemViewModel>
     {
         var item = await _context.Items
             .Include(i => i.Location)
+            .Include(item => item.Shelfs)
             .FirstOrDefaultAsync(i => i.Id == id);
 
         if (item == null)
@@ -105,7 +112,9 @@ public class ItemService : ICrudService<Item, ItemDto, ItemViewModel>
             Name = item.Name,
             Amount = item.Amount,
             Location = item.Location?.Name ?? "Unknown",
-            Shelf = item?.Shelf ?? "Unknown",
+            LocationId = item.LocationId,
+            // Shelf = item?.Shelf ?? "Unknown",
+            Shelf = item.Shelfs?.Name ?? "Unknown",
             Timestamp = item.Timestamp
         };
     }
@@ -126,8 +135,8 @@ public class ItemService : ICrudService<Item, ItemDto, ItemViewModel>
             Name = dto.Name,
             Amount = dto.Amount,
             LocationId = dto.LocationId,
-            UserId = int.Parse(userId),
-            Shelf = dto.Shelf,
+            UserId = userId,
+            ShelfsId = dto.ShelfId,
             Timestamp = DateOnly.FromDateTime(DateTime.Now)
         };
 
@@ -138,7 +147,7 @@ public class ItemService : ICrudService<Item, ItemDto, ItemViewModel>
     public async Task<ItemViewModel> Update(ItemDto dto, int id)
     {
         var userId = _userContext.GetUserId();
-        var existingItem = await _context.Items.FirstOrDefaultAsync(i => i.Id == id && userId.ToString() == userId);
+        var existingItem = await _context.Items.FirstOrDefaultAsync(i => i.Id == id && i.UserId == userId);
         if (existingItem == null)
         {
             throw new Exception("Update failed: item not found");
@@ -147,7 +156,7 @@ public class ItemService : ICrudService<Item, ItemDto, ItemViewModel>
         existingItem.Name = dto.Name;
         existingItem.Amount = dto.Amount;
         existingItem.LocationId = dto.LocationId;
-        existingItem.Shelf = dto.Shelf;
+        existingItem.ShelfsId = dto.ShelfId;
 
         await _context.SaveChangesAsync();
         return await GetById(id);
@@ -156,7 +165,7 @@ public class ItemService : ICrudService<Item, ItemDto, ItemViewModel>
     public async Task Delete(int id)
     {
         var userId = _userContext.GetUserId();
-        var item = await _context.Items.FirstOrDefaultAsync(i => i.Id == id && userId.ToString() == userId);
+        var item = await _context.Items.FirstOrDefaultAsync(i => i.Id == id && i.UserId == userId);
         if (item == null)
         {
             throw new Exception("Delete failed: item not found");

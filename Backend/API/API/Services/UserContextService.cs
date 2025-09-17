@@ -14,13 +14,15 @@ public class UserContextService : IUserContextService
         _httpContextAccessor = httpContextAccessor;
     }
 
-    public string GetUserId()
+    public int GetUserId()
     {
         var userId = _httpContextAccessor.HttpContext?.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-        if (string.IsNullOrEmpty(userId))
+
+        if (int.TryParse(userId, out int parsedUserId))
         {
-            throw new UnauthorizedAccessException();
+            return parsedUserId;
         }
-        return userId;
+
+        throw new UnauthorizedAccessException();
     }
 }

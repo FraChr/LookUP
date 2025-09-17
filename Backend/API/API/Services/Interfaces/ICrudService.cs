@@ -16,3 +16,7 @@ public interface ICrudService<TEntity, TCreateDto, TViewModel>
 
     Task Delete(int id);
 }
+
+public interface ICrudService<TEntity> : ICrudService<TEntity, TEntity, TEntity>
+{
+}

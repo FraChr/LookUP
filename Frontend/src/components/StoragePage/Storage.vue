@@ -4,22 +4,21 @@ import { useRouter } from 'vue-router';
 import Search from '@/components/Search.vue';
 import {fetchFactory} from '@/Services/fetchFactory.js';
 import {useDateFormat} from '@/composable/useDateFormat.js';
+import { useExcludeKeys } from '@/composable/useExcludeKeys.js';
 
 
+const storage = fetchFactory.useStorage();
+// const headers = computed(() => {
+//   const firstItem = storage.items.value[0];
+//   return firstItem ? Object.keys(firstItem).filter(key => key !== 'id' && key !== 'locationId') : [];
+// });
 
-const headers = computed(() => {
-  const firstItem = storage.items.value[0];
-  return firstItem ? Object.keys(firstItem).filter(key => key !== 'id') : [];
-});
+const headers = useExcludeKeys(storage.items, ['id', 'locationId']);
 
 const searchTerm = ref('');
 const router = useRouter();
 
-const storage = fetchFactory.useStorage();
 
-const displayDate = computed(() => {
-  return storage.items.value.map(item => useDateFormat(ref(item)))
-})
 
 const handleSearch =  (term) => {
   searchTerm.value = term;

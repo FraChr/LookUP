@@ -5,6 +5,7 @@ import { usePreventExponential } from '@/composable/usePreventExponential.js';
 import {fetchFactory} from '@/Services/fetchFactory.js';
 import { useExcludeKeys } from '@/composable/useExcludeKeys.js';
 import { useDateFormat } from '@/composable/useDateFormat.js';
+import Select from '@/Select.vue';
 
 const { preventExponential } = usePreventExponential();
 
@@ -24,18 +25,8 @@ const numberInputs = computed(() => {
     .map(([key]) => key);
 });
 
-
-
-
-// const displayDate = useDateFormat(storage.item.value.timestamp);
-const filteredItem = useExcludeKeys(storage.item, ['id']);
+const filteredItem = useExcludeKeys(storage.item, ['id', 'locationId']);
 const editable = useExcludeKeys(filteredItem, ['timestamp']);
-
-
-// watch(displayDate, (newVal) => {
-//   console.log("DATE: ", newVal);
-// })
-
 
 
 const update = () => {
@@ -53,12 +44,15 @@ const update = () => {
 const startEdit = (key) => {
   editingKey.value = key;
 
-  const matchRoom = location.items.value.find(room => room.name === storage.item.value.location);
-  tempItem.value['locationId'] = matchRoom?.id ?? null;
+
+  if(key === 'location') {
+    tempItem.value.locationId = Number(storage.item.value.locationId);
+  }
 
   tempItem.value[key] = storage.item.value[key];
 
-  console.log("TEMP ITEM",tempItem.value.locationId);
+  console.log("TEMP ITEM",tempItem.value[key]);
+  console.log("STORAGE.ITEM.VALUE ", storage.item.value);
 };
 
 const cancelEdit = () => {
@@ -93,12 +87,14 @@ onMounted(() => {
 
         <template v-if="editingKey === key && key !== 'timestamp'">
           <template v-if="editingKey === 'location'">
-            <select v-model="tempItem.locationId" class="border-2 p-2">
-              <option v-for="room in location.items.value" :key="room.id" :value="room.id">
-                {{ room.name }}
-              </option>
-            </select>
+<!--            <select v-model="tempItem.locationId" class="border-2 p-2">-->
+<!--              <option v-for="room in location.items.value" :key="room.id" :value="room.id">-->
+<!--                {{ room.name }}-->
+<!--              </option>-->
+<!--            </select>-->
+            <Select v-model="tempItem.locationId" :options="location.items.value" />
           </template>
+
 
           <template v-else>
             <input
