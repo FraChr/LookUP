@@ -147,7 +147,8 @@ public class ItemService : ICrudService<Item, ItemDto, ItemViewModel>
     public async Task<ItemViewModel> Update(ItemDto dto, int id)
     {
         var userId = _userContext.GetUserId();
-        var existingItem = await _context.Items.FirstOrDefaultAsync(i => i.Id == id && i.UserId == userId);
+        var existingItem = await _context.Items
+            .FirstOrDefaultAsync(i => i.Id == id && i.UserId == userId);
         if (existingItem == null)
         {
             throw new Exception("Update failed: item not found");

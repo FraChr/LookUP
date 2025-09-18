@@ -1,16 +1,16 @@
 <script setup>
 import { useRoute } from 'vue-router';
 import { onMounted, ref, computed, watch } from 'vue';
-import { usePreventExponential } from '@/composable/usePreventExponential.js';
+import { useNormalizeData } from '@/composable/useNormalizeData.js';
 import {fetchFactory} from '@/Services/fetchFactory.js';
 import { useExcludeKeys } from '@/composable/useExcludeKeys.js';
 import { useDateFormat } from '@/composable/useDateFormat.js';
 import Select from '@/Select.vue';
 
-const { preventExponential } = usePreventExponential();
+const { numberInput, toUpperCase } = useNormalizeData();
 
 const storage = fetchFactory.useStorage();
-const location = fetchFactory.useLocation();
+const locations = fetchFactory.useLocation();
 
 const route = useRoute();
 const id = route.params.id;
@@ -43,16 +43,8 @@ const update = () => {
 
 const startEdit = (key) => {
   editingKey.value = key;
-
-
-  if(key === 'location') {
-    tempItem.value.locationId = Number(storage.item.value.locationId);
-  }
-
+  tempItem.value.locationId = Number(storage.item.value.locationId);
   tempItem.value[key] = storage.item.value[key];
-
-  console.log("TEMP ITEM",tempItem.value[key]);
-  console.log("STORAGE.ITEM.VALUE ", storage.item.value);
 };
 
 const cancelEdit = () => {
@@ -61,12 +53,9 @@ const cancelEdit = () => {
 };
 
 const confirmEdit = (key) => {
-  storage.item.value['locationId'] = Number(tempItem.value['locationId']);
+  storage.item.value.locationId = Number(tempItem.value.locationId);
 
   storage.item.value[key] = tempItem.value[key];
-
-  console.log("TEMP ITEM",tempItem.value);
-  console.log("Item ", storage.item.value);
   update();
   editingKey.value = null;
   tempItem.value = {};
@@ -74,7 +63,7 @@ const confirmEdit = (key) => {
 
 onMounted(() => {
   storage.getSingle(id);
-  location.getAll();
+  locations.getAll();
 });
 </script>
 
@@ -83,16 +72,16 @@ onMounted(() => {
     <div class="w-2xl flex flex-col border-2 space-y-3 rounded-2xl p-2 select-none">
       <h1 class="underline text-center font-bold text-2xl">{{ storage.item.name }}</h1>
       <div v-for="(value, key) in filteredItem" :key="key" class="flex gap-7">
-        <p v-if="key !== 'locationId'" class="font-bold text-lg">{{ key.charAt(0).toUpperCase() + key.slice(1) }}:</p>
+        <p v-if="key !== 'locationId'" class="font-bold text-lg">{{ toUpperCase(key) }}:</p>
 
-        <template v-if="editingKey === key && key !== 'timestamp'">
+        <template v-if="editingKey === key ">
           <template v-if="editingKey === 'location'">
 <!--            <select v-model="tempItem.locationId" class="border-2 p-2">-->
 <!--              <option v-for="room in location.items.value" :key="room.id" :value="room.id">-->
 <!--                {{ room.name }}-->
 <!--              </option>-->
 <!--            </select>-->
-            <Select v-model="tempItem.locationId" :options="location.items.value" />
+            <Select v-model="tempItem.locationId" :options="locations.items.value" />
           </template>
 
 
@@ -104,7 +93,7 @@ onMounted(() => {
             />
             <input
               v-else
-              @input="tempItem[key] = preventExponential($event.target.value)"
+              @input="tempItem[key] = numberInput($event.target.value)"
               v-model="tempItem[key]"
               class="border border-gray-300 px-2 py-1 rounded"
             />

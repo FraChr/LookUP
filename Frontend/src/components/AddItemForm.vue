@@ -2,7 +2,7 @@
 // import { addItem } from '@/Services/api.js';
 import { onMounted, ref } from 'vue';
 
-import { usePreventExponential } from '@/composable/usePreventExponential.js';
+import { useNormalizeData } from '@/composable/useNormalizeData.js';
 
 import { fetchFactory } from '@/Services/fetchFactory.js';
 import Select from '@/Select.vue';
@@ -11,13 +11,14 @@ const storage = fetchFactory.useStorage();
 const location = fetchFactory.useLocation();
 const shelfs = fetchFactory.useShelfs();
 
+
 const selectedRoom = ref('');
 const selectedShelf = ref('');
 const tag = ref('');
 const amount = ref(0);
 const errorMsg = ref('');
 
-const { preventExponential } = usePreventExponential();
+const { numberInput } = useNormalizeData();
 
 const add = () => {
   errorMsg.value = '';
@@ -63,7 +64,7 @@ onMounted( () => {
       <input
         v-model="amount"
         type="text"
-        @input="amount = preventExponential($event.target.value)"
+        @input="amount = numberInput($event.target.value)"
         placeholder="Amount"
         class="border-2 p-2"
       />
