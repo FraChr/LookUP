@@ -4,13 +4,12 @@ import { onMounted, ref } from 'vue';
 
 import { useNormalizeData } from '@/composable/useNormalizeData.js';
 
-import { fetchFactory } from '@/Services/fetchFactory.js';
+import { crudFactory } from '@/Services/crudFactory.js';
 import Select from '@/Select.vue';
 
-const storage = fetchFactory.useStorage();
-const location = fetchFactory.useLocation();
-const shelfs = fetchFactory.useShelfs();
-
+const storage = crudFactory.useStorage();
+const location = crudFactory.useLocation();
+const shelfs = crudFactory.useShelfs();
 
 const selectedRoom = ref('');
 const selectedShelf = ref('');
@@ -31,9 +30,7 @@ const add = () => {
       ShelfId: Number(selectedShelf.value),
     };
 
-    console.log("ITEM ",item);
-
-     storage.addItem(item);
+    storage.addItem(item);
 
     selectedRoom.value = '';
     tag.value = '';
@@ -44,8 +41,7 @@ const add = () => {
   }
 };
 
-
-onMounted( () => {
+onMounted(() => {
   location.getAll();
   shelfs.getAll();
 });
@@ -54,12 +50,22 @@ onMounted( () => {
 <template>
   <div class="w-full flex flex-col items-center m-4">
     <form @submit.prevent="add" class="border-2 w-full max-w-md flex flex-col space-y-3 p-6">
-<!--      <select v-model="selected" class="border-2 p-2" required>-->
-<!--        <option value="" disabled>Select Room</option>-->
-<!--        <option v-for="room in location.items.value" :key="room.id" :value="room.id">{{ room.name }}</option>-->
-<!--      </select>-->
-      <Select v-model="selectedRoom" :options="location.items.value" :defaultOption="true" :defaultOptionValue="'Select Room'" />
-      <Select v-model="selectedShelf" :options="shelfs.items.value" :defaultOption="true" :defaultOptionValue="'Select Shelf'" />
+      <!--      <select v-model="selected" class="border-2 p-2" required>-->
+      <!--        <option value="" disabled>Select Room</option>-->
+      <!--        <option v-for="room in location.items.value" :key="room.id" :value="room.id">{{ room.name }}</option>-->
+      <!--      </select>-->
+      <Select
+        v-model="selectedRoom"
+        :options="location.items.value"
+        :defaultOption="true"
+        :defaultOptionValue="'Select Room'"
+      />
+      <Select
+        v-model="selectedShelf"
+        :options="shelfs.items.value"
+        :defaultOption="true"
+        :defaultOptionValue="'Select Shelf'"
+      />
       <input v-model="tag" type="text" placeholder="Item Tag" class="border-2 p-2" required />
       <input
         v-model="amount"
@@ -68,7 +74,6 @@ onMounted( () => {
         placeholder="Amount"
         class="border-2 p-2"
       />
-
 
       <div class="flex justify-center">
         <button type="submit" class="hover:bg-white bg-amber-200 border-2 px-6 py-2">Add</button>

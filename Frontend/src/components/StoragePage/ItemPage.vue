@@ -1,16 +1,17 @@
 <script setup>
 import { useRoute } from 'vue-router';
-import { onMounted, ref, computed, watch } from 'vue';
+import { onMounted, ref, computed } from 'vue';
 import { useNormalizeData } from '@/composable/useNormalizeData.js';
-import {fetchFactory} from '@/Services/fetchFactory.js';
+import { crudFactory } from '@/Services/crudFactory.js';
 import { useExcludeKeys } from '@/composable/useExcludeKeys.js';
-import { useDateFormat } from '@/composable/useDateFormat.js';
 import Select from '@/Select.vue';
+import CustomButton from "@/components/CustomDefaultElements/CustomButton.vue";
+import CustomInput from "@/components/CustomDefaultElements/CustomInput.vue";
 
-const { numberInput, toUpperCase } = useNormalizeData();
+const { numberInput, toUpperCase, dateFormat } = useNormalizeData();
 
-const storage = fetchFactory.useStorage();
-const locations = fetchFactory.useLocation();
+const storage = crudFactory.useStorage();
+const locations = crudFactory.useLocation();
 
 const route = useRoute();
 const id = route.params.id;
@@ -28,17 +29,14 @@ const numberInputs = computed(() => {
 const filteredItem = useExcludeKeys(storage.item, ['id', 'locationId']);
 const editable = useExcludeKeys(filteredItem, ['timestamp']);
 
-
 const update = () => {
-    const toSend = {
-      name: storage.item.value.name,
-      amount: storage.item.value.amount,
-      locationId: Number(storage.item.value.locationId),
-    };
+  const toSend = {
+    name: storage.item.value.name,
+    amount: storage.item.value.amount,
+    locationId: Number(storage.item.value.locationId),
+  };
 
   storage.updateItem(id, toSend);
-    console.log("ITEM ", storage.item.value);
-
 };
 
 const startEdit = (key) => {
@@ -74,54 +72,46 @@ onMounted(() => {
       <div v-for="(value, key) in filteredItem" :key="key" class="flex gap-7">
         <p v-if="key !== 'locationId'" class="font-bold text-lg">{{ toUpperCase(key) }}:</p>
 
-        <template v-if="editingKey === key ">
+        <template v-if="editingKey === key">
           <template v-if="editingKey === 'location'">
-<!--            <select v-model="tempItem.locationId" class="border-2 p-2">-->
-<!--              <option v-for="room in location.items.value" :key="room.id" :value="room.id">-->
-<!--                {{ room.name }}-->
-<!--              </option>-->
-<!--            </select>-->
             <Select v-model="tempItem.locationId" :options="locations.items.value" />
           </template>
 
-
           <template v-else>
-            <input
+            <CustomInput
               v-if="!numberInputs.includes(key)"
               v-model="tempItem[key]"
-              class="border border-gray-300 px-2 py-1 rounded"
             />
-            <input
-              v-else
-              @input="tempItem[key] = numberInput($event.target.value)"
-              v-model="tempItem[key]"
-              class="border border-gray-300 px-2 py-1 rounded"
+            <CustomInput
+                v-else
+                @input="tempItem[key] = numberInput($event.target.value)"
+                v-model="tempItem[key]"
             />
           </template>
 
-          <button
+          <CustomButton
             v-if="editingKey === key"
             @click="confirmEdit(key)"
-            class="cursor-pointer border-2 p-2 rounded-2xl hover:bg-amber-300"
           >
             Confirm
-          </button>
-          <button
+          </CustomButton>
+          <CustomButton
             @click="cancelEdit"
-            class="cursor-pointer border-2 p-2 rounded-2xl hover:bg-amber-300"
           >
             Cancel
-          </button>
+          </CustomButton>
         </template>
 
         <template v-else>
           <div class="flex justify-between w-full">
             <p class="mt-0.5">
-              {{ key === 'timestamp' ? useDateFormat(value) : value }}
+              {{ key === 'timestamp' ? dateFormat(value) : value }}
             </p>
-            <button v-if="Object.keys(editable).includes(key)" @click="startEdit(key)" class="cursor-pointer border-2 rounded-2xl p-2">
+            <CustomButton v-if="Object.keys(editable).includes(key)"
+                          @click="startEdit(key)"
+                          :label="'Edit'">
               Edit
-            </button>
+            </CustomButton>
           </div>
         </template>
       </div>

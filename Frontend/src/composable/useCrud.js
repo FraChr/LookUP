@@ -22,11 +22,10 @@ export function useCrud(route) {
         },
       });
 
-      console.log("response", response.data)
       items.value = response.data.data;
 
       total.value = response.data.total;
-      console.log(items.value)
+
     } catch (error) {
       console.error(`Error fetching data ${error.response.data}`);
     }
@@ -35,12 +34,11 @@ export function useCrud(route) {
   const getSingle = async (id) => {
     try {
       const response = await service.getById(id);
-      console.log("response FROM GetSingle: ", response.data);
-      item.value = response.data
+      item.value = response.data;
     } catch (e) {
       console.error('Error fetching item', e);
     }
-  }
+  };
 
   const updateItem = async (id, data) => {
     try {
@@ -49,12 +47,10 @@ export function useCrud(route) {
     } catch (error) {
       // console.error('Error updating item', error.message, '|', error.detail);
     }
-  }
+  };
   const addItem = async (data) => {
     try {
-
       const response = await service.create(data);
-
     } catch (error) {
       console.error('error response: ', error.response.data);
       // errorMsg.value = error.response?.data?.message || error.message;
@@ -64,12 +60,10 @@ export function useCrud(route) {
   const deleteItem = async (id) => {
     try {
       await service.delete(id);
-
     } catch (error) {
       console.error('Error deleting item: ', error);
     }
-  }
-
+  };
 
   return {
     items,

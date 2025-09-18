@@ -1,11 +1,9 @@
 <script setup>
-  import Storage from '@/components/StoragePage/Storage.vue';
+import Storage from '@/components/StoragePage/Storage.vue';
 </script>
 
 <template>
   <Storage />
 </template>
 
-<style scoped>
-
-</style>
+<style scoped></style>

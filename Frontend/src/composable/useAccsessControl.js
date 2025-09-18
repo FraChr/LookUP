@@ -2,10 +2,9 @@ import { auth } from '@/Services/api.js';
 import { useRouter } from 'vue-router';
 import { computed, ref } from 'vue';
 
-import {setLogoutHandler, setTokenHandler} from '@/Services/tokenHandler.js';
+import { setLogoutHandler, setTokenHandler } from '@/Services/tokenHandler.js';
 
 export function useAccessControl() {
-
   const router = useRouter();
   const email = ref('');
   const password = ref('');
@@ -25,12 +24,10 @@ export function useAccessControl() {
 
       const token = response.data.token;
 
-      console.log("login data", response.data);
-
       localStorage.setItem('token', token);
       await router.push('/');
     } catch (e) {
-      if(e.response.status === 401) {
+      if (e.response.status === 401) {
         error.value = 'Invalid username or password';
         email.value = '';
         password.value = '';
@@ -38,22 +35,20 @@ export function useAccessControl() {
     }
   }
 
-  async function logout(){
+  async function logout() {
     localStorage.removeItem('token');
     // await router.push('/');
     window.location.pathname = '/';
   }
 
   function getToken() {
-    return localStorage.getItem('token')
+    return localStorage.getItem('token');
   }
-
-
 
   setTokenHandler(getToken);
   setLogoutHandler(logout);
 
-  return{
+  return {
     email,
     password,
     error,
@@ -61,5 +56,5 @@ export function useAccessControl() {
     login,
     logout,
     getToken,
-  }
+  };
 }

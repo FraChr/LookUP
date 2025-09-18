@@ -1,11 +1,10 @@
 <script setup>
-  import { useRouter } from 'vue-router';
-  import { useAccessControl } from '@/composable/useAccsessControl.js';
-  import {logout} from '@/Services/tokenHandler.js';
+import { useRouter } from 'vue-router';
+import { useAccessControl } from '@/composable/useAccsessControl.js';
+import { logout } from '@/Services/tokenHandler.js';
 
-  const { hasToken } = useAccessControl();
-  const router = useRouter();
-
+const { hasToken } = useAccessControl();
+const router = useRouter();
 </script>
 
 <template>
@@ -14,14 +13,20 @@
       <ul class="p-5 pl-2 pr-2">
         <li class="mb-1"><RouterLink to="/">Home</RouterLink></li>
         <li class="mb-1"><RouterLink to="/storage">Storage</RouterLink></li>
-        <li class="mb-1"><RouterLink to="/user">UserPage</RouterLink></li>
+        <li class="mb-1"><RouterLink to="/user">Profile</RouterLink></li>
         <li v-if="!hasToken">
-          <button @click="router.push('/signup')" class="hover:bg-white bg-amber-200 border-2 px-6 py-2">
+          <button
+            @click="router.push('/signup')"
+            class="hover:bg-white bg-amber-200 border-2 px-6 py-2"
+          >
             Signup
           </button>
         </li>
         <li v-if="!hasToken">
-          <button @click="router.push('/login')" class="hover:bg-white bg-amber-200 border-2 px-6 py-2">
+          <button
+            @click="router.push('/login')"
+            class="hover:bg-white bg-amber-200 border-2 px-6 py-2"
+          >
             Log in
           </button>
         </li>

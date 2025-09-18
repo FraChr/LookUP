@@ -1,7 +1,7 @@
-import {useCrud} from '@/composable/useCrud.js';
+import { useCrud } from '@/composable/useCrud.js';
 
-export const fetchFactory = {
+export const crudFactory = {
   useStorage: () => useCrud('storage'),
   useLocation: () => useCrud('location'),
   useShelfs: () => useCrud('shelfs'),
-}
+};
