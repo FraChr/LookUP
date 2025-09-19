@@ -18,5 +18,8 @@ export function useJwtClaims() {
     if (!payload || !payload.exp) return null;
     return new Date(payload.exp * 1000);
   };
-  return { tokenExpiry };
+  return {
+    tokenExpiry,
+    parseJwt,
+  };
 }

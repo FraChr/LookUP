@@ -4,4 +4,5 @@ export const crudFactory = {
   useStorage: () => useCrud('storage'),
   useLocation: () => useCrud('location'),
   useShelfs: () => useCrud('shelfs'),
+  useUser: () => useCrud('user'),
 };

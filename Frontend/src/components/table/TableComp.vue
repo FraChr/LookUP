@@ -1,14 +1,17 @@
 <script setup>
+import { computed, unref } from 'vue';
+
   const props = defineProps({
     headers: {
       type: Array,
       required: true
     },
     data: {
-      type: Array,
+      type: [Array, Object],
       required: true
     }
   });
+  const resolvedData = computed(() => unref(props.data));
 </script>
 
 <template>
@@ -17,20 +20,23 @@
       <tr>
         <th v-for="(header, i) in headers"
             :key="`${header}${i}`"
-            class="px-6 py-4">{{header}}</th>
+            class="px-6 py-4">
+          {{ header }}
+        </th>
         <slot name="extraHeaders"></slot>
       </tr>
     </thead>
     <tbody>
-      <tr v-for="entity in data"
-          :key="`entity-${entity.name}`"
+      <tr v-for="entity in resolvedData"
+          :key="`entity-${entity.id}`"
           class="border-b bg-gray-800 border-gray-700 group"
-          @click="$emit('row-click', entity)">
+          >
         <td v-for="(header, i) in headers"
             :key="`${header}-${i}`"
             class="px-6 py-4 cursor-pointer group-hover:bg-gray-700 first:group-hover:rounded-l-2xl"
-            :class="[i === headers.length - 1 ? 'group-hover:rounded-r-2xl' : '']">
-            <slot :name="`column${i}`" :entity="entity"></slot>
+            :class="[i === headers.length - 1 ? 'group-hover:rounded-r-2xl' : '']"
+            @click="$emit('row-click', entity)">
+            <slot :name="`column${i}`" :entity="entity">{{entity[header]}}</slot>
         </td>
         <slot name="extraColumns" :entity="entity"></slot>
       </tr>
@@ -38,6 +44,4 @@
   </table>
 </template>
 
-<style scoped>
-
-</style>
+<style scoped></style>

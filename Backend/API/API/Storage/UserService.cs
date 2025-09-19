@@ -30,9 +30,21 @@ public class UserService : ICrudService<User, UserDto, UserViewModel>
         throw new NotImplementedException();
     }
 
-    public Task<UserViewModel> GetById(int id)
+    public async Task<UserViewModel> GetById(int id)
     {
-        throw new NotImplementedException();
+        var user = await _context.Users.FirstOrDefaultAsync(u => u.Id == id);
+
+        if (user == null)
+        {
+            throw new Exception("User not found");
+        }
+
+        return new UserViewModel
+        {
+            Id = user.Id,
+            UserName = user.UserName,
+            Email = user.Email,
+        };
     }
 
     public async Task Create(UserDto userDto)
@@ -66,13 +78,23 @@ public class UserService : ICrudService<User, UserDto, UserViewModel>
         }
     }
 
-    public Task<UserViewModel> Update(UserDto item, int id)
+    public Task<UserViewModel> Update(UserDto user, int id)
     {
         throw new NotImplementedException();
     }
 
-    public Task Delete(int id)
+    public async Task Delete(int id)
     {
-        throw new NotImplementedException();
+        var user = await _context.Users.FirstOrDefaultAsync(u => u.Id == id);
+        if(user == null) { throw new Exception("User not found"); }
+
+        var items = await _context.Items.Where(i => i.UserId == id).ToListAsync();
+
+        _context.Items.RemoveRange(items);
+        _context.Users.Remove(user);
+
+        await _context.SaveChangesAsync();
+
+        Console.WriteLine($"USER: {user.UserName} ITEMS: {items.Count}");
     }
 }

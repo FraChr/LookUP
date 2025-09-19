@@ -6,6 +6,7 @@ import { crudFactory } from '@/Services/crudFactory.js';
 import { useExcludeKeys } from '@/composable/useExcludeKeys.js';
 import { useNormalizeData } from '@/composable/useNormalizeData.js';
 import TableComp from '@/components/table/TableComp.vue';
+import Select from '@/Select.vue';
 
 const { dateFormat } = useNormalizeData();
 
@@ -22,10 +23,10 @@ const handleSearch = (term) => {
   storage.getAll(term);
 };
 
-const removeItem = (id) => {
+const removeItem = async (data) => {
   try {
-    storage.deleteItem(id);
-    storage.getAll();
+    await storage.deleteItem(data.id);
+    await storage.getAll();
   } catch (error) {
     console.error(`Error deleting item: ${error}`);
   }
@@ -46,84 +47,38 @@ const prevPage = () => {
 };
 
 const navigateToItem = (data) => {
-  // router.push({ path: `/storage/${id}` });
   router.push({ path: `/storage/${data.id}` });
 };
 
-onMounted(() => storage.getAll());
+
+
+onMounted(() => {
+  storage.getAll();
+});
 </script>
 
 <template>
   <Search @search="handleSearch" />
 
   <div class="z-40 flex justify-center items-center select-none">
-    <TableComp :headers="headers" :data="storage.items.value" @row-click="navigateToItem">
+    <TableComp :headers="headers" :data="storage.items" @row-click="navigateToItem">
       <template #extraHeaders>
         <th></th>
       </template>
-      <template #column0="{entity}">
-        {{entity.name}}
+      <template #column4="{ entity }">
+        {{ dateFormat(entity.timestamp) }}
       </template>
-      <template #column1="{entity}">
-        {{entity.amount}}
-      </template>
-      <template #column2="{entity}">
-        {{entity.location}}
-      </template>
-      <template #column3="{entity}">
-        {{entity.shelf}}
-      </template>
-      <template #column4="{entity}">
-        {{dateFormat(entity.timestamp)}}
-      </template>
-      <template #extraColumns="entity">
-        <button
-          @click="removeItem(entity.id)"
-          class="hover:cursor-pointer hover:text-white border p-2 rounded-full"
-        >
-          Delete
-        </button>
+      <template #extraColumns="{ entity }">
+        <td>
+          <button
+            class="hover:cursor-pointer hover:text-white border p-2 rounded-full"
+            @click="removeItem(entity)"
+          >
+            Delete
+          </button>
+        </td>
       </template>
     </TableComp>
-
-
-
-<!--    <table class="w-full text-sm text-left rtl:text-right text-gray-400">-->
-<!--      <thead class="text-xs uppercase bg-gray-700 text-gray-400">-->
-<!--        <tr>-->
-<!--          <th v-for="header in headers" :key="header" class="px-6 py-4">-->
-<!--            {{ header }}-->
-<!--          </th>-->
-<!--          <th></th>-->
-<!--        </tr>-->
-<!--      </thead>-->
-
-<!--      <tbody>-->
-<!--        <tr-->
-<!--          v-for="item in storage.items.value"-->
-<!--          :key="item.id"-->
-<!--          class="border-b bg-gray-800 border-gray-700 group"-->
-<!--        >-->
-<!--          <td-->
-<!--            v-for="(header, index) in headers"-->
-<!--            :key="header"-->
-<!--            @click="navigateToItem(item.id)"-->
-<!--            class="px-6 py-4 cursor-pointer group-hover:bg-gray-700 first:group-hover:rounded-l-2xl"-->
-<!--            :class="[index === headers.length - 1 ? 'group-hover:rounded-r-2xl' : '']"-->
-<!--          >-->
-<!--            {{ header === 'timestamp' ? dateFormat(item[header]) : item[header] }}-->
-<!--          </td>-->
-<!--          <td>-->
-<!--            <button-->
-<!--              @click="removeItem(item.id)"-->
-<!--              class="hover:cursor-pointer hover:text-white border p-2 rounded-full"-->
-<!--            >-->
-<!--              Delete-->
-<!--            </button>-->
-<!--          </td>-->
-<!--        </tr>-->
-<!--      </tbody>-->
-<!--    </table>-->
   </div>
 
   <div class="flex flex-col items-center mt-4 select-none">
