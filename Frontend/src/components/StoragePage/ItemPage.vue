@@ -5,8 +5,9 @@ import { useNormalizeData } from '@/composable/useNormalizeData.js';
 import { crudFactory } from '@/Services/crudFactory.js';
 import { useExcludeKeys } from '@/composable/useExcludeKeys.js';
 import Select from '@/Select.vue';
-import CustomButton from "@/components/CustomDefaultElements/CustomButton.vue";
-import CustomInput from "@/components/CustomDefaultElements/CustomInput.vue";
+import CustomButton from '@/components/CustomDefaultElements/CustomButton.vue';
+import CustomInput from '@/components/CustomDefaultElements/CustomInput.vue';
+import ShowData from '@/components/UserPage/ShowData.vue';
 
 const { numberInput, toUpperCase, dateFormat } = useNormalizeData();
 
@@ -69,51 +70,35 @@ onMounted(() => {
   <div class="flex flex-row justify-around">
     <div class="w-2xl flex flex-col border-2 space-y-3 rounded-2xl p-2 select-none">
       <h1 class="underline text-center font-bold text-2xl">{{ storage.item.name }}</h1>
-      <div v-for="(value, key) in filteredItem" :key="key" class="flex gap-7">
-        <p v-if="key !== 'locationId'" class="font-bold text-lg">{{ toUpperCase(key) }}:</p>
+      <div v-for="(value, key) in filteredItem" :key="key" class="flex justify-between gap-7">
+        <p class="font-bold text-lg">{{ toUpperCase(key) }}:</p>
 
-        <template v-if="editingKey === key">
-          <template v-if="editingKey === 'location'">
-            <Select v-model="tempItem.locationId" :options="locations.items.value" />
-          </template>
+        <div class="flex justify-between w-full" v-if="editingKey === key">
 
-          <template v-else>
-            <CustomInput
-              v-if="!numberInputs.includes(key)"
-              v-model="tempItem[key]"
-            />
-            <CustomInput
-                v-else
-                @input="tempItem[key] = numberInput($event.target.value)"
-                v-model="tempItem[key]"
-            />
-          </template>
+          <Select v-if="editingKey === 'location'"
+                  v-model="tempItem.locationId"
+                  :options="locations.items.value" />
 
+          <CustomInput v-else-if="numberInputs.includes(key)" v-model="tempItem[key]"
+                    @input="tempItem[key] = numberInput($event.target.value)">
+          </CustomInput>
+
+          <CustomInput v-else v-model="tempItem[key]"></CustomInput>
+
+          <CustomButton  @click="confirmEdit(key)"> Confirm </CustomButton>
+          <CustomButton @click="cancelEdit"> Cancel </CustomButton>
+        </div>
+
+        <div v-else class="flex justify-between w-full">
+          <ShowData :value="key === 'timestamp' ? dateFormat(value) : value"> </ShowData>
           <CustomButton
-            v-if="editingKey === key"
-            @click="confirmEdit(key)"
+            v-if="Object.keys(editable).includes(key)"
+            @click="startEdit(key)"
+            :label="'Edit'"
           >
-            Confirm
+            Edit
           </CustomButton>
-          <CustomButton
-            @click="cancelEdit"
-          >
-            Cancel
-          </CustomButton>
-        </template>
-
-        <template v-else>
-          <div class="flex justify-between w-full">
-            <p class="mt-0.5">
-              {{ key === 'timestamp' ? dateFormat(value) : value }}
-            </p>
-            <CustomButton v-if="Object.keys(editable).includes(key)"
-                          @click="startEdit(key)"
-                          :label="'Edit'">
-              Edit
-            </CustomButton>
-          </div>
-        </template>
+        </div>
       </div>
     </div>
   </div>

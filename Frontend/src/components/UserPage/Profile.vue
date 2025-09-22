@@ -1,14 +1,14 @@
 <script setup>
-  import CustomButton from '@/components/CustomDefaultElements/CustomButton.vue';
   import { crudFactory } from '@/Services/crudFactory.js';
-  import { onMounted, ref, watch } from 'vue';
+  import { onMounted, reactive, ref, toRaw, watch } from 'vue';
   import { useJwtClaims } from '@/composable/useJwtClaims.js';
   import { useAccessControl } from '@/composable/useAccsessControl.js';
   import { useExcludeKeys } from '@/composable/useExcludeKeys.js';
   import ProfileOptions from '@/components/UserPage/ProfileOptions.vue';
-  import CustomInput from '@/components/CustomDefaultElements/CustomInput.vue';
   import ShowData from '@/components/UserPage/ShowData.vue';
   import EditData from '@/components/UserPage/EditData.vue';
+  import Rooms from '@/components/Rooms/Rooms.vue';
+  import CustomButton from '@/components/CustomDefaultElements/CustomButton.vue';
 
   const { parseJwt } = useJwtClaims();
   const { getToken, logout } = useAccessControl();
@@ -18,52 +18,50 @@
   const parsedToken = parseJwt(token);
 
   const filteredData = useExcludeKeys(user.item, ['id']);
-  const editing = ref(false);
-  const tempItem = ref();
 
-  // async function test() {
-  //   console.log("Delete clicked!!!");
-  //   // await user.deleteItem(parsedToken.id);
-  //   // await logout();
-  // }
-  //
-  // function editStorage() {
-  //   console.log("Edit Storage Clicked!!!");
-  // }
-  // function editProfile() {
-  //   console.log("edit Profile Clicked!!!");
-  // }
-
-  watch(editing, newVal => {
-    console.log("editing value", newVal)
+  let editing = ref({
+    editProfile: false,
+    editRooms: false
   });
-  watch(tempItem, newVal => {
-    console.log("tempItem", newVal);
-  });
+  const labels = {
+    editProfile: 'Edit Profile',
+    editRooms: 'Edit Rooms',
+  };
 
-  const t = () => {
-    console.log("editing user with func t");
-    Object.assign(tempItem.value, user.item.value);
-  }
+  // const editing = ref(false);
+  const tempItem = reactive({});
+  // const roomsEdit = ref(false);
 
-  const confirmEdit = () => {
-    // user.item.value[key] = tempItem[key];
-    Object.assign(user.item.value, tempItem.value);
-    update();
-  }
+watch(editing, (newValue, oldValue) => {
+  console.log("editing values: ", newValue);
+})
 
-  const update = async () => {
-
-    const toSend = {
-      userName: user.userName,
-      email: user.email,
-      userId: user.id,
+  const update = async (key) => {
+    if(key === 'editProfile') {
+      Object.assign(user.item.value, tempItem);
+      const toSend = {
+        userName: user.item.value.userName,
+        email: user.item.value.email,
+      }
+      await user.updateItem(parsedToken.id, toSend);
+    } else {
+      console.log("NO UPDATE LOGIC RUN");
     }
-    await user.updateItem(parsedToken.id, toSend);
   }
 
-  onMounted(() => {
-    user.getSingle(parsedToken.id);
+  const deleteProfile = async () => {
+    await user.deleteItem(parsedToken.id);
+    await logout();
+  }
+
+  const editRooms = () => {
+    // editing.roomsEdit.value = true;
+  }
+
+  onMounted(async () => {
+    await user.getSingle(parsedToken.id);
+
+    Object.assign(tempItem, toRaw(user.item.value));
   });
 
 </script>
@@ -73,38 +71,47 @@
 <template>
   <h1>USER VIEW HERE</h1>
   <div class="w-full flex flex-row justify-between">
+    <div class="w-full">
     <ProfileOptions v-model="editing"
-                    @editing="val => editing = val"
-                    @confirm="confirmEdit"
-                    @startEdit="t"
-    ></ProfileOptions>
-  <div class="w-full flex border-2">
-    <section class="w-full p-3">
-      <div v-for="(value, key) in filteredData"
-           :key="key"
-           class="flex flex-row justify-between">
-        <h2>{{ key }}:</h2>
+                    :labels="labels"
+                    @confirm="update"
+                    @delete="deleteProfile"
+                    @editRooms="editRooms"
+    >
+      <template #customActions="{keyName, editing}">
+        <CustomButton v-if="keyName === 'editProfile'"
+                      @click="deleteProfile">
+          Delete
+        </CustomButton>
+      </template>
+    </ProfileOptions>
+    </div>
 
 
-        <EditData
-          v-if="editing === true"
-          v-model="tempItem[key]"
-          :keyName="key"
-          @editing="val => editing = val">
-        </EditData>
-<!--        <template v-if="editing === true">-->
-<!--          <CustomInput />-->
-<!--        </template>-->
+    <div class="w-full flex flex-col border-2">
+      <section class="w-full p-3">
+        <div v-for="(value, key) in filteredData"
+             :key="key"
+             class="flex flex-row justify-between">
+          <h2>{{ key }}:</h2>
 
-        <ShowData v-else
-                  :value="value"></ShowData>
-<!--        <template v-else>-->
-<!--          <p>{{ value }}</p>-->
-<!--        </template>-->
-      </div>
-    </section>
+
+          <EditData
+            v-if="editing.editProfile === true"
+            v-model="tempItem[key]">
+          </EditData>
+
+          <ShowData v-else :value="value"></ShowData>
+
+
+        </div>
+      </section>
+
+    </div>
   </div>
-  </div>
+  <section v-if="editing.editRooms === true">
+    <Rooms/>
+  </section>
 </template>
 
 <style scoped></style>

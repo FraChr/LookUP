@@ -78,9 +78,19 @@ public class UserService : ICrudService<User, UserDto, UserViewModel>
         }
     }
 
-    public Task<UserViewModel> Update(UserDto user, int id)
+    public async Task<UserViewModel> Update(UserDto dto, int id)
     {
-        throw new NotImplementedException();
+        var existingUser = await _context.Users.FirstOrDefaultAsync(u => u.Id == id);
+        if (existingUser == null)
+        {
+            throw new Exception("User not found");
+        }
+
+        existingUser.UserName = dto.UserName;
+        existingUser.Email = dto.Email;
+
+        await _context.SaveChangesAsync();
+        return await GetById(id);
     }
 
     public async Task Delete(int id)

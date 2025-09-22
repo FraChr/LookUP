@@ -5,7 +5,8 @@
 </script>
 
 <template>
-  <p>{{ value }}</p>
+<!--  <p>{{ value }}</p>-->
+  <slot>{{ value }}</slot>
 </template>
 
 <style scoped>

@@ -1,25 +1,21 @@
 <script setup>
-  import CustomInput from '@/components/CustomDefaultElements/CustomInput.vue';
-  import CustomButton from '@/components/CustomDefaultElements/CustomButton.vue';
+import CustomInput from '@/components/CustomDefaultElements/CustomInput.vue';
 
-  const props = defineProps({
-    modelValue: {},
-    keyName: Number,
-    value: String,
-  });
+const props = defineProps({
+  modelValue: [String, Number],
+  number: Boolean
+});
 
-  const emit = defineEmits(['update:modelValue']);
+const emit = defineEmits(['update:modelValue']);
 
-  function updateValue(val) {
-    emit('update:modelValue', val);
-  }
+function updateValue(val) {
+  emit('update:modelValue', val);
+}
 </script>
 
 <template>
-  <CustomInput :modelValue="modelValue"
-  @update:modelValue="updateValue"/>
+    <CustomInput :modelValue="modelValue"
+    @update:modelValue="updateValue"/>
 </template>
 
-<style scoped>
-
-</style>
+<style scoped></style>
