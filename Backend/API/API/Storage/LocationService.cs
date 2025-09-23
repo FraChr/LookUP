@@ -9,15 +9,20 @@ namespace API.Storage;
 public class LocationService : ICrudService<Location, LocationDto, LocationViewModel>
 {
     private readonly AppDbContext _context;
+    private readonly IUserContextService _userContext;
 
-    public LocationService(AppDbContext context)
+    public LocationService(AppDbContext context, IUserContextService userContextService)
     {
         _context = context;
+        _userContext = userContextService;
     }
 
     public async Task<PageResult<LocationViewModel>> GetAll(int? limit = null, int? page = null)
     {
-        var query = await _context.Room.ToListAsync();
+        var userId = _userContext.GetUserId();
+
+
+        var query = await _context.Room.Where(q => q.UserId == userId).ToListAsync();
 
         var viewModels = query.Select(q => new LocationViewModel
         {
@@ -44,7 +49,16 @@ public class LocationService : ICrudService<Location, LocationDto, LocationViewM
 
     public async Task Create(LocationDto dto)
     {
-        throw new NotImplementedException();
+        var userId = _userContext.GetUserId();
+
+        var room = new Location
+        {
+            Name = dto.Name,
+            UserId = userId
+        };
+
+        await _context.AddAsync(room);
+        await _context.SaveChangesAsync();
     }
 
     public async Task<LocationViewModel> Update(LocationDto dto, int id)
@@ -52,8 +66,15 @@ public class LocationService : ICrudService<Location, LocationDto, LocationViewM
         throw new NotImplementedException();
     }
 
-    public async Task Delete(int itemId)
+    public async Task Delete(int locationId)
     {
-        throw new NotImplementedException();
+        var userId = _userContext.GetUserId();
+        var room = await _context.Room.FirstOrDefaultAsync(q => q.Id == locationId && q.UserId == userId);
+        if (room == null)
+        {
+            throw new Exception("Delete failed: Room not found");
+        }
+        _context.Room.Remove(room);
+        await _context.SaveChangesAsync();
     }
 }

@@ -8,6 +8,7 @@ import Select from '@/Select.vue';
 import CustomButton from '@/components/CustomDefaultElements/CustomButton.vue';
 import CustomInput from '@/components/CustomDefaultElements/CustomInput.vue';
 import ShowData from '@/components/UserPage/ShowData.vue';
+import ProfileOptions from '@/components/ProfileOptions.vue';
 
 const { numberInput, toUpperCase, dateFormat } = useNormalizeData();
 
@@ -20,6 +21,17 @@ const id = route.params.id;
 const editingKey = ref(null);
 
 let tempItem = ref({});
+
+let editing = ref({
+  editName: false,
+  editAmount: false,
+  editLocation: false,
+  editShelf: false,
+});
+const labels = {
+  editProfile: 'Edit Profile',
+  editRooms: 'Edit Rooms',
+};
 
 const numberInputs = computed(() => {
   return Object.entries(storage.item.value)
@@ -60,20 +72,25 @@ const confirmEdit = (key) => {
   tempItem.value = {};
 };
 
-onMounted(() => {
-  storage.getSingle(id);
-  locations.getAll();
+onMounted(async() => {
+  await storage.getSingle(id);
+  await locations.getAll();
+  console.log("testEdit ", editing)
 });
+
 </script>
 
 <template>
+
   <div class="flex flex-row justify-around">
     <div class="w-2xl flex flex-col border-2 space-y-3 rounded-2xl p-2 select-none">
       <h1 class="underline text-center font-bold text-2xl">{{ storage.item.name }}</h1>
       <div v-for="(value, key) in filteredItem" :key="key" class="flex justify-between gap-7">
+
         <p class="font-bold text-lg">{{ toUpperCase(key) }}:</p>
 
         <div class="flex justify-between w-full" v-if="editingKey === key">
+
 
           <Select v-if="editingKey === 'location'"
                   v-model="tempItem.locationId"

@@ -1,5 +1,6 @@
 <script setup>
   import CustomButton from '@/components/CustomDefaultElements/CustomButton.vue';
+  import { onMounted, watch } from 'vue';
   const props = defineProps({
     modelValue: {
       type: [Object, Array],
@@ -9,11 +10,14 @@
       type: Array,
       default: () => ['edit', 'confirm'],
     },
-    labels: {}
-
+    labels: {},
+    styles: ''
   });
-  const emit = defineEmits(['update:modelValue', 'confirm', 'delete', 'edit']);
+  const emit = defineEmits(['update:modelValue', 'confirm', 'edit']);
 
+  watch(props.modelValue, (newValue) => {
+    console.log("value of modelvalue in options comp. ",newValue);
+  });
   const updateModelValue = (key, bool) => {
     return {
       ...props.modelValue,
@@ -79,7 +83,9 @@
   // }
 
 
-
+onMounted(() => {
+  console.log("modelValue on mount ", props.modelValue);
+})
 
 </script>
 

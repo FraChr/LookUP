@@ -10,16 +10,20 @@ public class ShelfsService : ICrudService<Shelfs, ShelfsDto, ShelfsViewModel>
 {
 
     private readonly AppDbContext _context;
+    private readonly IUserContextService _userContext;
 
-    public ShelfsService(AppDbContext context)
+    public ShelfsService(AppDbContext context, IUserContextService userContextService)
     {
         _context = context;
+        _userContext = userContextService;
     }
 
 
     public async Task<PageResult<ShelfsViewModel>> GetAll(int? limit = null, int? page = null)
     {
-        var query = await _context.Shelfs.ToListAsync();
+        var userId = _userContext.GetUserId();
+
+        var query = await _context.Shelfs.Where(q => q.UserId == userId).ToListAsync();
         var result = query.Select(q => new ShelfsViewModel
         {
             Id = q.Id,
@@ -42,9 +46,17 @@ public class ShelfsService : ICrudService<Shelfs, ShelfsDto, ShelfsViewModel>
         throw new NotImplementedException();
     }
 
-    public Task Create(ShelfsDto dto)
+    public async Task Create(ShelfsDto dto)
     {
-        throw new NotImplementedException();
+        var userId = _userContext.GetUserId();
+        var shelf = new Shelfs
+        {
+            Name = dto.Name,
+            UserId = userId
+        };
+
+        await _context.AddAsync(shelf);
+        await _context.SaveChangesAsync();
     }
 
     public Task<ShelfsViewModel> Update(ShelfsDto item, int id)
@@ -52,8 +64,15 @@ public class ShelfsService : ICrudService<Shelfs, ShelfsDto, ShelfsViewModel>
         throw new NotImplementedException();
     }
 
-    public Task Delete(int id)
+    public async Task Delete(int id)
     {
-        throw new NotImplementedException();
+        var userId = _userContext.GetUserId();
+        var shelf = _context.Shelfs.FirstOrDefault(q => q.Id == id && q.UserId == userId);
+        if (shelf == null)
+        {
+            throw new Exception("Delete failed: Shelf not found");
+        }
+        _context.Shelfs.Remove(shelf);
+        await _context.SaveChangesAsync();
     }
 }
