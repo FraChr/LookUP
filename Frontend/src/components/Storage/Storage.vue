@@ -12,7 +12,7 @@ const { dateFormat } = useNormalizeData();
 
 const storage = crudFactory.useStorage();
 
-const headers = useExcludeKeys(storage.items, ['id', 'locationId']);
+const headers = useExcludeKeys(storage.items, ['id', 'locationId', 'shelfsId']);
 
 const searchTerm = ref('');
 const router = useRouter();

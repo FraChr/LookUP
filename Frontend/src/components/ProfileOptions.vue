@@ -91,8 +91,8 @@ onMounted(() => {
 
 <template>
 
-  <div v-for="(value, key) in modelValue" :key="key" class="w-full flex border-2 gap-2 flex-col">
-    <h3 class="font-bold">{{ labels[key] ?? key }}</h3>
+  <div v-for="(value, key) in modelValue" :key="key" class="w-full flex gap-2 flex-col">
+    <h3 class="font-bold flex justify-center">{{ labels[key] ?? key }}</h3>
     <div class="flex flex-row" v-if="value === true">
       <CustomButton class="w-full" @click="onConfirm(key)">Acc</CustomButton>
       <CustomButton class="w-full" @click="onCancel(key)">X</CustomButton>

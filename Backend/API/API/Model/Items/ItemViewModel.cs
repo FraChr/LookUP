@@ -8,5 +8,6 @@ public class ItemViewModel
     public string Location { get; set; }
     public int LocationId { get; set; }
     public string? Shelf { get; set; }
+    public int ShelfsId { get; set; }
     public DateOnly Timestamp { get; set; }
 }

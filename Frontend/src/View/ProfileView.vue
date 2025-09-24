@@ -5,7 +5,7 @@
 </script>
 
 <template>
-  <div class="w-1/2">
+  <div class="w-1/2 flex flex-col gap-4">
   <Profile />
   <Rooms />
   <Shelfs />

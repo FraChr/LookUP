@@ -8,9 +8,10 @@
   import CustomButton from '@/components/CustomDefaultElements/CustomButton.vue';
 
   const shelfs = crudFactory.useShelfs();
-  const headers = useExcludeKeys(shelfs.items, 'id');
+  const headers = useExcludeKeys(shelfs.items, ['id']);
 
   const shelfName = ref('');
+  const showTable = ref(false);
 
   let editing = ref({
     editShelf: false,
@@ -19,8 +20,11 @@
     editShelf: 'Edit Shelf',
   };
 
+  function toggleTable() {
+    showTable.value = !showTable.value;
+  }
+
   async function addShelf() {
-    console.log('added shelf');
     if(shelfName.value === '') return;
     await shelfs.addItem({Name: shelfName.value});
     await shelfs.getAll();
@@ -28,7 +32,6 @@
   }
 
   async function removeShelf(data) {
-    console.log('removeShelf');
     await shelfs.deleteItem(data.id);
     await shelfs.getAll()
   }
@@ -42,15 +45,19 @@
 <template>
   <div class="grid grid-cols-2 gap-4 w-full">
     <div>
-      <ProfileOptions v-model="editing" :labels="labels" @confirm="addShelf"></ProfileOptions>
+      <ProfileOptions v-model="editing" :labels="labels" @confirm="addShelf">
+        <template #customActions="{keyName, editing}">
+          <CustomButton v-if="keyName === 'editShelf'" @click="toggleTable">{{showTable ? 'Hide Table' : 'Show Tables' }}</CustomButton>
+        </template>
+      </ProfileOptions>
     </div>
-    <div class="flex flex-col border-2">
+    <div class="flex flex-col">
       <form v-if="editing.editShelf === true" @submit.prevent="addShelf">
         <label>Add Shelf</label>
-        <CustomInput v-model="shelfName" placeholder="Shelf Name" />
+        <CustomInput v-model="shelfName" maxlength="50" placeholder="Shelf Name" />
       </form>
 
-      <TableComp :data="shelfs.items" :headers="headers">
+      <TableComp v-if="showTable" :data="shelfs.items" :headers="headers">
         <template #extraHeaders>
           <th></th>
         </template>

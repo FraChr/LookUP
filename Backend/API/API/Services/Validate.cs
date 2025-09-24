@@ -24,7 +24,7 @@ public partial class Validate : IValidate
             throw new Exception("Passwords do not match");
         }
 
-        if (userDto.UserName.Length < 5)
+        if (userDto.Username.Length < 5)
         {
             throw new Exception("User name must be 5 or more characters");
         }

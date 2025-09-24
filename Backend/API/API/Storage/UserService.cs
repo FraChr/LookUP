@@ -42,7 +42,7 @@ public class UserService : ICrudService<User, UserDto, UserViewModel>
         return new UserViewModel
         {
             Id = user.Id,
-            UserName = user.UserName,
+            Username = user.Username,
             Email = user.Email,
         };
     }
@@ -54,7 +54,7 @@ public class UserService : ICrudService<User, UserDto, UserViewModel>
             _validate.ValidateNewUser(userDto);
 
             var exists = await _context.Users
-                .AnyAsync(u => u.Email == userDto.Email.ToLower() || u.UserName == userDto.UserName.ToLower());
+                .AnyAsync(u => u.Email == userDto.Email.ToLower() || u.Username == userDto.Username.ToLower());
             if (exists)
             {
                 throw new Exception("User already exists");
@@ -64,7 +64,7 @@ public class UserService : ICrudService<User, UserDto, UserViewModel>
 
             var user = new User
             {
-                UserName = userDto.UserName.ToLower(),
+                Username = userDto.Username.ToLower(),
                 Email = userDto.Email.ToLower(),
                 HashedPassword = passwordHash,
             };
@@ -86,7 +86,7 @@ public class UserService : ICrudService<User, UserDto, UserViewModel>
             throw new Exception("User not found");
         }
 
-        existingUser.UserName = dto.UserName;
+        existingUser.Username = dto.Username;
         existingUser.Email = dto.Email;
 
         await _context.SaveChangesAsync();
@@ -105,6 +105,6 @@ public class UserService : ICrudService<User, UserDto, UserViewModel>
 
         await _context.SaveChangesAsync();
 
-        Console.WriteLine($"USER: {user.UserName} ITEMS: {items.Count}");
+        Console.WriteLine($"USER: {user.Username} ITEMS: {items.Count}");
     }
 }

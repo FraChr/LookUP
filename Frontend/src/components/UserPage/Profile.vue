@@ -30,7 +30,7 @@ const tempItem = reactive({});
 const update = async () => {
   Object.assign(user.item.value, tempItem);
   const toSend = {
-    userName: user.item.value.userName,
+    username: user.item.value.username,
     email: user.item.value.email,
   };
   await user.updateItem(parsedToken.id, toSend);
@@ -50,7 +50,6 @@ onMounted(async () => {
 </script>
 
 <template>
-  <h1>USER VIEW HERE</h1>
   <div class="grid grid-cols-2 gap-4 w-full">
     <div>
       <ProfileOptions v-model="editing" :labels="labels" @confirm="update">
@@ -62,7 +61,7 @@ onMounted(async () => {
       </ProfileOptions>
     </div>
 
-    <div class="flex flex-col border-2">
+    <div class="flex flex-col">
       <div  v-for="(value, key) in filteredData" :key="key" class="m-2 flex flex-row justify-between">
         <h2>{{ key }}:</h2>
 

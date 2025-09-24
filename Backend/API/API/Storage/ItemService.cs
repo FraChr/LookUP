@@ -2,6 +2,7 @@
 using API.Model;
 using API.Model.Items;
 using API.Services.Interfaces;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 
 namespace API.Storage;
@@ -46,6 +47,7 @@ public class ItemService : ICrudService<Item, ItemDto, ItemViewModel>
             Location = item.Location?.Name ?? "Unknown",
             LocationId = item.LocationId,
             Shelf = item.Shelfs?.Name ?? "Unknown",
+            ShelfsId = item.ShelfsId,
             Timestamp = item.Timestamp
         });
 
@@ -113,8 +115,8 @@ public class ItemService : ICrudService<Item, ItemDto, ItemViewModel>
             Amount = item.Amount,
             Location = item.Location?.Name ?? "Unknown",
             LocationId = item.LocationId,
-            // Shelf = item?.Shelf ?? "Unknown",
             Shelf = item.Shelfs?.Name ?? "Unknown",
+            ShelfsId = item.ShelfsId,
             Timestamp = item.Timestamp
         };
     }
@@ -136,7 +138,7 @@ public class ItemService : ICrudService<Item, ItemDto, ItemViewModel>
             Amount = dto.Amount,
             LocationId = dto.LocationId,
             UserId = userId,
-            ShelfsId = dto.ShelfId,
+            ShelfsId = dto.ShelfsId,
             Timestamp = DateOnly.FromDateTime(DateTime.Now)
         };
 
@@ -157,7 +159,7 @@ public class ItemService : ICrudService<Item, ItemDto, ItemViewModel>
         existingItem.Name = dto.Name;
         existingItem.Amount = dto.Amount;
         existingItem.LocationId = dto.LocationId;
-        existingItem.ShelfsId = dto.ShelfId;
+        existingItem.ShelfsId = dto.ShelfsId;
 
         await _context.SaveChangesAsync();
         return await GetById(id);

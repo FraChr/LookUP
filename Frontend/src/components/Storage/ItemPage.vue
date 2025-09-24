@@ -14,6 +14,7 @@ const { numberInput, toUpperCase, dateFormat } = useNormalizeData();
 
 const storage = crudFactory.useStorage();
 const locations = crudFactory.useLocation();
+const shelfs = crudFactory.useShelfs();
 
 const route = useRoute();
 const id = route.params.id;
@@ -22,16 +23,16 @@ const editingKey = ref(null);
 
 let tempItem = ref({});
 
-let editing = ref({
-  editName: false,
-  editAmount: false,
-  editLocation: false,
-  editShelf: false,
-});
-const labels = {
-  editProfile: 'Edit Profile',
-  editRooms: 'Edit Rooms',
-};
+// let editing = ref({
+//   editName: false,
+//   editAmount: false,
+//   editLocation: false,
+//   editShelf: false,
+// });
+// const labels = {
+//   editProfile: 'Edit Profile',
+//   editRooms: 'Edit Rooms',
+// };
 
 const numberInputs = computed(() => {
   return Object.entries(storage.item.value)
@@ -39,7 +40,7 @@ const numberInputs = computed(() => {
     .map(([key]) => key);
 });
 
-const filteredItem = useExcludeKeys(storage.item, ['id', 'locationId']);
+const filteredItem = useExcludeKeys(storage.item, ['id', 'locationId', 'shelfsId']);
 const editable = useExcludeKeys(filteredItem, ['timestamp']);
 
 const update = () => {
@@ -47,6 +48,7 @@ const update = () => {
     name: storage.item.value.name,
     amount: storage.item.value.amount,
     locationId: Number(storage.item.value.locationId),
+    shelfsId: Number(storage.item.value.shelfsId),
   };
 
   storage.updateItem(id, toSend);
@@ -55,6 +57,7 @@ const update = () => {
 const startEdit = (key) => {
   editingKey.value = key;
   tempItem.value.locationId = Number(storage.item.value.locationId);
+  tempItem.value.shelfsId = Number(storage.item.value.shelfsId);
   tempItem.value[key] = storage.item.value[key];
 };
 
@@ -65,8 +68,10 @@ const cancelEdit = () => {
 
 const confirmEdit = (key) => {
   storage.item.value.locationId = Number(tempItem.value.locationId);
+  storage.item.value.shelfsId = Number(tempItem.value.shelfsId);
 
   storage.item.value[key] = tempItem.value[key];
+  console.log('storage.item.value', storage.item.value);
   update();
   editingKey.value = null;
   tempItem.value = {};
@@ -75,7 +80,8 @@ const confirmEdit = (key) => {
 onMounted(async() => {
   await storage.getSingle(id);
   await locations.getAll();
-  console.log("testEdit ", editing)
+  await shelfs.getAll();
+  console.log("item.value: ", storage.item.value);
 });
 
 </script>
@@ -84,7 +90,6 @@ onMounted(async() => {
 
   <div class="flex flex-row justify-around">
     <div class="w-2xl flex flex-col border-2 space-y-3 rounded-2xl p-2 select-none">
-      <h1 class="underline text-center font-bold text-2xl">{{ storage.item.name }}</h1>
       <div v-for="(value, key) in filteredItem" :key="key" class="flex justify-between gap-7">
 
         <p class="font-bold text-lg">{{ toUpperCase(key) }}:</p>
@@ -95,6 +100,10 @@ onMounted(async() => {
           <Select v-if="editingKey === 'location'"
                   v-model="tempItem.locationId"
                   :options="locations.items.value" />
+
+          <Select v-else-if="editingKey === 'shelf'"
+                  v-model="tempItem.shelfsId"
+                  :options="shelfs.items.value" />
 
           <CustomInput v-else-if="numberInputs.includes(key)" v-model="tempItem[key]"
                     @input="tempItem[key] = numberInput($event.target.value)">

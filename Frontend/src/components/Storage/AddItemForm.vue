@@ -27,11 +27,11 @@ const add = () => {
       Name: tag.value,
       Amount: Number(amount.value),
       LocationId: Number(selectedRoom.value),
-      ShelfId: Number(selectedShelf.value),
+      ShelfsId: Number(selectedShelf.value),
     };
 
     storage.addItem(item);
-
+    console.log("addItem", item);
     selectedRoom.value = '';
     tag.value = '';
     amount.value = 0;

@@ -9,7 +9,7 @@ public class Item
     public int Amount { get; set; }
     public int LocationId { get; set; }
     public int UserId { get; set; }
-    public int? ShelfsId { get; set; }
+    public int ShelfsId { get; set; }
     public DateOnly Timestamp { get; set; }
 
     public Shelf.Shelfs Shelfs { get; set; }

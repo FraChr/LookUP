@@ -1,5 +1,5 @@
 <script setup>
-import Storage from '@/components/StoragePage/Storage.vue';
+import Storage from '@/components/Storage/Storage.vue';
 </script>
 
 <template>

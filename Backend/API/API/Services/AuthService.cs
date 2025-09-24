@@ -22,7 +22,7 @@ public class AuthService : IAuthService
 
     public async Task<string> Login(LoginDto loginDto)
     {
-        var user = await _context.Users.FirstOrDefaultAsync(u => u.UserName == loginDto.Identifier.ToLower() || u.Email == loginDto.Identifier.ToLower());
+        var user = await _context.Users.FirstOrDefaultAsync(u => u.Username == loginDto.Identifier.ToLower() || u.Email == loginDto.Identifier.ToLower());
 
         if (user == null)
         {
@@ -38,7 +38,7 @@ public class AuthService : IAuthService
         var claims = new[]
         {
             new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-            new Claim(ClaimTypes.Name, user.UserName)
+            new Claim(ClaimTypes.Name, user.Username)
         };
 
         var issuer = Environment.GetEnvironmentVariable("JWT_ISSUER");
