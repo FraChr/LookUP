@@ -99,8 +99,12 @@ public class UserService : ICrudService<User, UserDto, UserViewModel>
         if(user == null) { throw new Exception("User not found"); }
 
         var items = await _context.Items.Where(i => i.UserId == id).ToListAsync();
+        var shelfs = await _context.Shelfs.Where(s => s.UserId == id).ToListAsync();
+        var rooms = await _context.Room.Where(r => r.UserId == id).ToListAsync();
 
         _context.Items.RemoveRange(items);
+        _context.Shelfs.RemoveRange(shelfs);
+        _context.Room.RemoveRange(rooms);
         _context.Users.Remove(user);
 
         await _context.SaveChangesAsync();

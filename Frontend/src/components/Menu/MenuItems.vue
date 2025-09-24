@@ -11,9 +11,9 @@ const router = useRouter();
   <div>
     <nav class="z-50 absolute h-full w-1/3 left-0 bg-gray-600">
       <ul class="p-5 pl-2 pr-2">
-        <li class="mb-1"><RouterLink to="/">Home</RouterLink></li>
-        <li class="mb-1"><RouterLink to="/storage">Storage</RouterLink></li>
-        <li class="mb-1"><RouterLink to="/user">Profile</RouterLink></li>
+        <li v-if="hasToken" class="mb-1"><RouterLink to="/">Home</RouterLink></li>
+        <li v-if="hasToken" class="mb-1"><RouterLink to="/storage">Storage</RouterLink></li>
+        <li v-if="hasToken" class="mb-1"><RouterLink to="/user">Profile</RouterLink></li>
         <li v-if="!hasToken">
           <button
             @click="router.push('/signup')"
