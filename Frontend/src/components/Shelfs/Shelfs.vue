@@ -3,7 +3,7 @@
   import {crudFactory} from '@/Services/crudFactory.js';
   import TableComp from '@/components/table/TableComp.vue';
   import {useExcludeKeys} from '@/composable/useExcludeKeys.js';
-  import ProfileOptions from '@/components/ProfileOptions.vue';
+  import EditOptions from '@/components/EditOptions.vue';
   import CustomInput from '@/components/CustomDefaultElements/CustomInput.vue';
   import CustomButton from '@/components/CustomDefaultElements/CustomButton.vue';
 
@@ -45,11 +45,11 @@
 <template>
   <div class="grid grid-cols-2 gap-4 w-full">
     <div>
-      <ProfileOptions v-model="editing" :labels="labels" @confirm="addShelf">
+      <EditOptions v-model="editing" :labels="labels" @confirm="addShelf">
         <template #customActions="{keyName, editing}">
           <CustomButton v-if="keyName === 'editShelf'" @click="toggleTable">{{showTable ? 'Hide Table' : 'Show Tables' }}</CustomButton>
         </template>
-      </ProfileOptions>
+      </EditOptions>
     </div>
     <div class="flex flex-col">
       <form v-if="editing.editShelf === true" @submit.prevent="addShelf">

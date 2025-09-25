@@ -6,7 +6,7 @@ import { useAccessControl } from '@/composable/useAccsessControl.js';
 import { useExcludeKeys } from '@/composable/useExcludeKeys.js';
 import ShowData from '@/components/UserPage/ShowData.vue';
 import CustomButton from '@/components/CustomDefaultElements/CustomButton.vue';
-import ProfileOptions from '@/components/ProfileOptions.vue';
+import EditOptions from '@/components/EditOptions.vue';
 import CustomInput from '@/components/CustomDefaultElements/CustomInput.vue';
 
 const { parseJwt } = useJwtClaims();
@@ -52,13 +52,13 @@ onMounted(async () => {
 <template>
   <div class="grid grid-cols-2 gap-4 w-full">
     <div>
-      <ProfileOptions v-model="editing" :labels="labels" @confirm="update">
+      <EditOptions v-model="editing" :labels="labels" @confirm="update">
         <template #customActions="{ keyName, editing }">
           <CustomButton v-if="keyName === 'editProfile'" @click="deleteProfile">
             Delete
           </CustomButton>
         </template>
-      </ProfileOptions>
+      </EditOptions>
     </div>
 
     <div class="flex flex-col">

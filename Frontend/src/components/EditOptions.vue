@@ -41,51 +41,9 @@
     emit('update:modelValue', updated);
   }
 
-  // function onDelete(key) {
-  //   emit('delete', key);
-  // }
-
-
-  // async function DeleteProfile() {
-  //   console.log("Delete clicked!!!");
-  //   emit('delete');
-  // }
-  //
-  // function editStorage() {
-  //   console.log("Edit Storage Clicked!!!");
-  //   emit('update:modelValue', true)
-  //   emit('editRooms');
-  // }
-  // function editProfile(key) {
-  //   console.log("edit Profile Clicked!!!");
-  //   // emit('update:modelValue', true);
-  //
-  //   // const updated = {
-  //   //   ...props.modelValue,
-  //   //   editProfile: true
-  //   // };
-  //
-  //   let updated = updateModelValue(key, true);
-  //
-  //   // console.log("Edit Profile Clicked!!!", updated);
-  //   emit('update:modelValue', updated);
-  //   console.log("Edit Profile Clicked!!!", props.modelValue);
-  // }
-  // function confirmEditProfile() {
-  //   console.log("Confirm Edit Profile Clicked!!!");
-  //   emit('confirm');
-  // }
-
-
-  // function cancelEditProfile(key) {
-  //   let updated = updateModelValue(key, false)
-  //   emit('update:modelValue', updated);
-  // }
-
-
-onMounted(() => {
-  console.log("modelValue on mount ", props.modelValue);
-})
+  onMounted(() => {
+    console.log("modelValue on mount ", props.modelValue);
+  });
 
 </script>
 

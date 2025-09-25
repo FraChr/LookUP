@@ -1,24 +1,22 @@
 import { createRouter, createWebHistory } from 'vue-router';
-
-import HomePageView from './View/HomePageView.vue';
-import StorageView from '@/View/StorageView.vue';
-import ItemPageView from '@/View/ItemPageView.vue';
-import ProfileView from '@/View/ProfileView.vue';
-import LoginView from '@/View/LoginView.vue';
-import SignupView from '@/View/signupView.vue';
-
-const routes = [
-  { path: '/', component: HomePageView },
-  { path: '/storage', component: StorageView },
-  { path: '/user', component: ProfileView },
-  { path: '/storage/:id', component: ItemPageView },
-  { path: '/login', component: LoginView },
-  { path: '/signup', component: SignupView },
-];
+import { useAccessControl } from '@/composable/useAccsessControl.js';
+import { routes } from '@/data/routes.js';
 
 const router = createRouter({
   history: createWebHistory(),
   routes,
+});
+router.beforeEach((to, from, next) => {
+  const { hasToken } = useAccessControl();
+  const isAuthenticated = hasToken.value;
+
+  if (to.meta.requiresAuth && !isAuthenticated) {
+    next('/login');
+  } else if (to.meta.guestOnly && isAuthenticated) {
+    next('/');
+  } else {
+    next();
+  }
 });
 
 export default router;

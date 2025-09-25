@@ -1,4 +1,18 @@
 ﻿/*@tailwind base;*/
 /*@tailwind components;*/
 /*@tailwind utilities;*/
+@import "tailwindcss/preflight";
+@import "tailwindcss/utilities";
 @import 'tailwindcss';
+
+
+@theme {
+    /*--color-*: initial;*/
+    --color-eggshell: #FAF3DD;
+    --color-black: #090C02;
+    --color-pink: #81717A;
+    --color-green: #5C7457;
+    --color-olive: #6F732F;
+}
+
+

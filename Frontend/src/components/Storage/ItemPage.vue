@@ -8,7 +8,7 @@ import Select from '@/Select.vue';
 import CustomButton from '@/components/CustomDefaultElements/CustomButton.vue';
 import CustomInput from '@/components/CustomDefaultElements/CustomInput.vue';
 import ShowData from '@/components/UserPage/ShowData.vue';
-import ProfileOptions from '@/components/ProfileOptions.vue';
+import EditOptions from '@/components/EditOptions.vue';
 
 const { numberInput, toUpperCase, dateFormat } = useNormalizeData();
 

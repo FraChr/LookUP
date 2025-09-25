@@ -58,7 +58,9 @@ onMounted(() => {
 </script>
 
 <template>
+
   <Search @search="handleSearch" />
+
 
   <div class="z-40 flex justify-center items-center select-none">
     <TableComp :headers="headers" :data="storage.items" @row-click="navigateToItem">

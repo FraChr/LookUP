@@ -1,5 +1,7 @@
 <script setup>
 import { ref } from 'vue';
+import CustomButton from '@/components/CustomDefaultElements/CustomButton.vue';
+import CustomInput from '@/components/CustomDefaultElements/CustomInput.vue';
 
 const searchTerm = ref('');
 
@@ -11,9 +13,18 @@ const handleSearch = () => {
 </script>
 
 <template>
-  <div class="mb-5 flex justify-center gap-5">
-    <input v-model="searchTerm" class="border-2" />
-    <button @click="handleSearch" class="border-2 px-2 py-1 rounded-2xl">Search</button>
+<!--  <div class="mb-5 flex justify-center gap-5">-->
+<!--    <CustomButton >X</CustomButton>-->
+<!--    <CustomInput v-model="searchTerm" />-->
+<!--    <CustomButton @click="handleSearch">Search</CustomButton>-->
+<!--  </div>-->
+
+  <div class="flex justify-center">
+    <div class="mb-5 max-w-md flex flex-row border p-1">
+      <CustomInput :style="'flex-grow p-2  border-none focus:outline-none'" v-model="searchTerm" />
+      <CustomButton :style="''">X</CustomButton>
+      <CustomButton @click="handleSearch">Search</CustomButton>
+    </div>
   </div>
 </template>
 

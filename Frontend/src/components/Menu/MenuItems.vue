@@ -11,27 +11,29 @@ const router = useRouter();
   <div>
     <nav class="z-50 absolute h-full w-1/3 left-0 bg-gray-600">
       <ul class="p-5 pl-2 pr-2">
-        <li v-if="hasToken" class="mb-1"><RouterLink to="/">Home</RouterLink></li>
-        <li v-if="hasToken" class="mb-1"><RouterLink to="/storage">Storage</RouterLink></li>
-        <li v-if="hasToken" class="mb-1"><RouterLink to="/user">Profile</RouterLink></li>
-        <li v-if="!hasToken">
+        <li class="mb-1"><RouterLink to="/">Home</RouterLink></li>
+        <li class="mb-1"><RouterLink to="/storage">Storage</RouterLink></li>
+        <li class="mb-1"><RouterLink to="/user">Profile</RouterLink></li>
+        <li>
           <button
+            v-if="!hasToken"
             @click="router.push('/signup')"
             class="hover:bg-white bg-amber-200 border-2 px-6 py-2"
           >
             Signup
           </button>
         </li>
-        <li v-if="!hasToken">
+        <li>
           <button
+            v-if="!hasToken"
             @click="router.push('/login')"
             class="hover:bg-white bg-amber-200 border-2 px-6 py-2"
           >
             Log in
           </button>
         </li>
-        <li v-if="hasToken">
-          <button @click="logout" class="hover:bg-white bg-amber-200 border-2 px-6 py-2">
+        <li>
+          <button v-if="hasToken" @click="logout" class="hover:bg-white bg-amber-200 border-2 px-6 py-2">
             Log Out
           </button>
         </li>

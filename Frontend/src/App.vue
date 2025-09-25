@@ -1,8 +1,8 @@
 ﻿<script setup>
-import Header from '@/components/Header.vue';
+  import Header from '@/components/Header/Header.vue';
 </script>
 
-<template>
+<template >
   <div>
     <Header />
     <div class="p-8 pt-5">
