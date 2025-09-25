@@ -21,9 +21,9 @@ const toggleMenu = () => {
       @click="toggleMenu"
       class="cursor-pointer relative w-8 h-8 flex flex-col justify-around items-center"
     >
-      <span class="w-6 h-0.5 bg-black"></span>
-      <span class="w-6 h-0.5 bg-black"></span>
-      <span class="w-6 h-0.5 bg-black"></span>
+      <span class="w-6 h-0.5 bg-primary"></span>
+      <span class="w-6 h-0.5 bg-primary"></span>
+      <span class="w-6 h-0.5 bg-primary"></span>
     </button>
 
     <MenuItems v-if="isMenuOpen" />

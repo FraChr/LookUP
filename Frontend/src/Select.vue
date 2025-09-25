@@ -15,7 +15,8 @@ function onChange(event) {
 }
 </script>
 <template>
-  <select :value="modelValue" @change="onChange" class="border-2 px-2 py-1">
+  <select :value="modelValue" @change="onChange"
+          class="border-2 border-contrast rounded px-2 py-1 ">
     <option v-if="defaultOption === true" value="" disabled>{{ defaultOptionValue }}</option>
     <option v-for="option in options" :key="option.id" :value="option.id">
       {{ option.name }}

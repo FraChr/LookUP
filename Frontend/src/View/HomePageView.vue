@@ -8,6 +8,7 @@ import { useJwtClaims } from '@/composable/useJwtClaims.js';
 import Card from '@/components/Card/Card.vue';
 import {cardRoutes} from '@/data/cardRoutes.js';
 import { useNormalizeData } from '@/composable/useNormalizeData.js';
+import CustomButton from '@/components/CustomDefaultElements/CustomButton.vue';
 
 const {parseJwt} = useJwtClaims();
 const {getToken } = useAccessControl();
@@ -32,13 +33,13 @@ onMounted(async () => {
     <h1 class="font-bold">{{ hasToken ? `Welcome ${user.item.value.username}` : 'Welcome to homepage' }}</h1>
   </div>
 
-  <div v-if="hasToken" class="w-full border-2 border-amber-600 flex justify-center">
+  <div v-if="hasToken" class="w-full flex justify-center">
     <AddItemForm />
   </div>
 
-  <div  class="grid grid-cols-4 gap 4" >
+  <div class="grid grid-cols-4 gap 4" >
     <div v-for="(value, key) in activeRoutes" :key="key">
-      <RouterLink :to="value.path">
+      <RouterLink class="rounded-2xl focus:ring focus:outline-text" :to="value.path">
         <Card :value="value.title"></Card>
       </RouterLink>
     </div>

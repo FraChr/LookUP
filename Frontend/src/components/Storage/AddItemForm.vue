@@ -6,6 +6,8 @@ import { useNormalizeData } from '@/composable/useNormalizeData.js';
 
 import { crudFactory } from '@/Services/crudFactory.js';
 import Select from '@/Select.vue';
+import CustomInput from '@/components/CustomDefaultElements/CustomInput.vue';
+import CustomButton from '@/components/CustomDefaultElements/CustomButton.vue';
 
 const storage = crudFactory.useStorage();
 const location = crudFactory.useLocation();
@@ -14,7 +16,7 @@ const shelfs = crudFactory.useShelfs();
 const selectedRoom = ref('');
 const selectedShelf = ref('');
 const tag = ref('');
-const amount = ref(0);
+const amount = ref();
 const errorMsg = ref('');
 
 const { numberInput } = useNormalizeData();
@@ -34,7 +36,7 @@ const add = () => {
     console.log("addItem", item);
     selectedRoom.value = '';
     tag.value = '';
-    amount.value = 0;
+    amount.value = null;
   } catch (error) {
     console.error('error response: ', error.response.data);
     errorMsg.value = error.response?.data?.message || error.message;
@@ -49,7 +51,7 @@ onMounted(() => {
 
 <template>
   <div class="w-full flex flex-col items-center m-4">
-    <form @submit.prevent="add" class="border-2 w-full max-w-md flex flex-col space-y-3 p-6">
+    <form @submit.prevent="add" class="border-2 border-contrast w-full max-w-md flex flex-col space-y-3 p-6">
       <!--      <select v-model="selected" class="border-2 p-2" required>-->
       <!--        <option value="" disabled>Select Room</option>-->
       <!--        <option v-for="room in location.items.value" :key="room.id" :value="room.id">{{ room.name }}</option>-->
@@ -66,8 +68,12 @@ onMounted(() => {
         :defaultOption="true"
         :defaultOptionValue="'Select Shelf'"
       />
-      <input v-model="tag" type="text" placeholder="Item Tag" class="border-2 p-2" required />
-      <input
+      <CustomInput v-model="tag"
+                   type="text"
+                   placeholder="Item Tag"
+                   class="border-2 p-2"
+                   required />
+      <CustomInput
         v-model="amount"
         type="text"
         @input="amount = numberInput($event.target.value)"
@@ -76,7 +82,10 @@ onMounted(() => {
       />
 
       <div class="flex justify-center">
-        <button type="submit" class="hover:bg-white bg-amber-200 border-2 px-6 py-2">Add</button>
+        <CustomButton type="submit"
+                      class="px-6 py-2"
+          >
+          Add</CustomButton>
       </div>
     </form>
     <div v-if="errorMsg" class="text-red-500 font-semibold p-2 text-center">

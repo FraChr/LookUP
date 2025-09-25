@@ -4,9 +4,9 @@
 
 <template>
   <div class="flex flex-col">
-    <header class="bg-gray-600 bg-pink flex justify-between items-center px-5 py-3">
+    <header class="bg-contrast flex justify-between items-center px-5 py-3">
       <Menu />
-      <h1 class="text-black  text-2xl">
+      <h1 class="text-primary text-3xl font-bold">
         <RouterLink to="/"> LookUp </RouterLink>
       </h1>
       <RouterLink to="/user">
