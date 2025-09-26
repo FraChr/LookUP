@@ -18,6 +18,8 @@ const headers = useExcludeKeys(storage.items, ['id', 'locationId', 'shelfsId']);
 const searchTerm = ref('');
 const router = useRouter();
 
+const update = async () => storage.getAll(searchTerm.value ? searchTerm.value : undefined);
+
 const handleSearch = (term) => {
   searchTerm.value = term;
   storage.currentPage.value = 1;
@@ -35,14 +37,21 @@ const removeItem = async (data) => {
 
 const nextPage = () => {
   storage.currentPage.value++;
-  storage.getAll(searchTerm.value ? searchTerm.value : undefined);
+  update();
 };
 
 const prevPage = () => {
   storage.currentPage.value--;
-  storage.getAll(searchTerm.value ? searchTerm.value : undefined);
+  update();
 };
-
+const toStart = () => {
+  storage.currentPage.value = 1;
+  update();
+}
+const toEnd = () => {
+  storage.currentPage.value = storage.totalPages.value;
+  update();
+}
 const navigateToItem = (data) => {
   router.push({ path: `/storage/${data.id}` });
 };
@@ -81,7 +90,9 @@ onMounted(() => {
   <Paging :currentPage="storage.currentPage.value"
           :totalPages="storage.totalPages.value"
           @nextPage="nextPage"
-          @previousPage="prevPage">
+          @previousPage="prevPage"
+          @toStart="toStart"
+          @toEnd="toEnd">
   </Paging>
 </template>
 
