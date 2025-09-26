@@ -50,24 +50,24 @@ onMounted(async () => {
       </EditOptions>
     </div>
 
-    <div class="flex flex-col">
+    <div class="flex flex-col gap-4">
       <form v-if="editing.editRooms === true" @submit.prevent="addRoom">
         <label>Add Room</label>
         <CustomInput v-model="roomName" placeholder="Room Name"></CustomInput>
       </form>
 
-      <TableComp v-if="showTable" :data="rooms.items" :headers="headers">
+      <TableComp class="min-w-sm" v-if="showTable" :data="rooms.items" :headers="headers">
         <template #extraHeaders>
           <th></th>
         </template>
         <template #extraColumns="{ entity }">
-          <td>
-            <button
-              class="hover:cursor-pointer hover:text-white border p-2 rounded-full"
+          <td class="flex justify-end p-2">
+            <CustomButton
+              class="border-primary"
               @click="removeRoom(entity)"
             >
               Delete
-            </button>
+            </CustomButton>
           </td>
         </template>
       </TableComp>

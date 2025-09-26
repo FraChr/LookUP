@@ -57,18 +57,18 @@
         <CustomInput v-model="shelfName" maxlength="50" placeholder="Shelf Name" />
       </form>
 
-      <TableComp v-if="showTable" :data="shelfs.items" :headers="headers">
+      <TableComp class="min-w-sm flex-shrink" v-if="showTable" :data="shelfs.items" :headers="headers">
         <template #extraHeaders>
           <th></th>
         </template>
         <template #extraColumns="{ entity }">
-          <td>
-            <button
-              class="hover:cursor-pointer hover:text-white border p-2 rounded-full"
+          <td class="flex justify-end p-2">
+            <CustomButton
+              class="border-primary"
               @click="removeShelf(entity)"
             >
               Delete
-            </button>
+            </CustomButton>
           </td>
         </template>
       </TableComp>

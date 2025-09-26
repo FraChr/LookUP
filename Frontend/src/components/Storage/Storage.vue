@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, watch } from 'vue';
 import { useRouter } from 'vue-router';
 import Search from '@/components/Search.vue';
 import { crudFactory } from '@/Services/crudFactory.js';
@@ -7,6 +7,7 @@ import { useExcludeKeys } from '@/composable/useExcludeKeys.js';
 import { useNormalizeData } from '@/composable/useNormalizeData.js';
 import TableComp from '@/components/table/TableComp.vue';
 import Select from '@/Select.vue';
+import Paging from '@/components/Storage/Paging.vue'
 
 const { dateFormat } = useNormalizeData();
 
@@ -33,15 +34,11 @@ const removeItem = async (data) => {
 };
 
 const nextPage = () => {
-  if (storage.currentPage.value >= storage.totalPages.value) return;
-
   storage.currentPage.value++;
   storage.getAll(searchTerm.value ? searchTerm.value : undefined);
 };
 
 const prevPage = () => {
-  if (storage.currentPage.value <= 1) return;
-
   storage.currentPage.value--;
   storage.getAll(searchTerm.value ? searchTerm.value : undefined);
 };
@@ -50,8 +47,6 @@ const navigateToItem = (data) => {
   router.push({ path: `/storage/${data.id}` });
 };
 
-
-
 onMounted(() => {
   storage.getAll();
 });
@@ -59,7 +54,7 @@ onMounted(() => {
 
 <template>
 
-  <Search @search="handleSearch" />
+  <Search @search="handleSearch" @clearSearch="searchTerm" />
 
 
   <div class="z-40 flex justify-center items-center select-none">
@@ -83,27 +78,11 @@ onMounted(() => {
     </TableComp>
   </div>
 
-  <div class="flex flex-col items-center mt-4 select-none">
-    <div class="flex justify-around w-full mb-2">
-      <button
-        @click="prevPage"
-        :disabled="storage.currentPage.value === 1"
-        class="disabled:opacity-50 disabled:line-through border-3 rounded-full border-gray-400 text-gray-400 p-2 hover:text-black hover:border-black"
-      >
-        Previous
-      </button>
-      <button
-        @click="nextPage"
-        :disabled="storage.currentPage.value === storage.totalPages.value"
-        class="disabled:opacity-50 disabled:line-through border-3 rounded-full border-gray-400 text-gray-400 p-2 hover:text-black hover:border-black"
-      >
-        Next
-      </button>
-    </div>
-    <span class="text-gray-400"
-      >Page {{ storage.currentPage.value }} of {{ storage.totalPages.value }}</span
-    >
-  </div>
+  <Paging :currentPage="storage.currentPage.value"
+          :totalPages="storage.totalPages.value"
+          @nextPage="nextPage"
+          @previousPage="prevPage">
+  </Paging>
 </template>
 
 <style scoped></style>

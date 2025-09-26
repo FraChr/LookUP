@@ -7,38 +7,6 @@
 
 
 @theme {
-    /*--color-*: initial;*/
-
-    /*--color-customBlack: #090C02;*/
-    /*--color-customPink: #81717A;*/
-    /*--color-customGreen: #5C7457;*/
-    /*--color-customOlive: #6F732F;*/
-
-
-    /*--color-primary: #FAF3DD;*/
-
-    /*!* contrast *!*/
-    /*--color-contrast: #CDEAE1;*/
-    /*--color-accent-4: #A9D9D0;*/
-    /*--color-dark: #4A6D6A;*/
-
-
-
-
-    /*--color-accent-1: #F6D6AD;*/
-    /*--color-accent-2: #FAD4C0;*/
-    /*--color-accent-3: #F8C8DC;*/
-
-    /*!* background, text, ui *!*/
-    /*--color-light: #FFFFFF;*/
-    /*--color-muted: #C4BFB4;*/
-    /*--color-text: #6B5E4E;*/
-
-    /*--color-green: #B6C48E;*/
-    /*--color-brown: #DDB892;*/
-    /*--color-blue: #94A3B8;*/
-
-
     --color-primary: #FAF3DC;
     /*--color-text: #332906;*/
     --color-text: #0C0801;
