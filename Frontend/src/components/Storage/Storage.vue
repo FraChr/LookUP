@@ -8,6 +8,7 @@ import { useNormalizeData } from '@/composable/useNormalizeData.js';
 import TableComp from '@/components/table/TableComp.vue';
 import Select from '@/Select.vue';
 import Paging from '@/components/Storage/Paging.vue'
+import CustomButton from '@/components/CustomDefaultElements/CustomButton.vue';
 
 const { dateFormat } = useNormalizeData();
 
@@ -24,6 +25,7 @@ const handleSearch = (term) => {
   searchTerm.value = term;
   storage.currentPage.value = 1;
   storage.getAll(term);
+  console.log("after getAll call when searching: ", storage.items.value);
 };
 
 const removeItem = async (data) => {
@@ -56,6 +58,11 @@ const navigateToItem = (data) => {
   router.push({ path: `/storage/${data.id}` });
 };
 
+
+watch(storage.totalPages, (newVal, oldVal) => {
+  console.log("totalPages old: " + oldVal + "totalPages new: " + newVal)
+});
+
 onMounted(() => {
   storage.getAll();
 });
@@ -76,12 +83,12 @@ onMounted(() => {
       </template>
       <template #extraColumns="{ entity }">
         <td>
-          <button
-            class="hover:cursor-pointer hover:text-white border p-2 rounded-full"
+          <CustomButton
+
             @click="removeItem(entity)"
           >
             Delete
-          </button>
+          </CustomButton>
         </td>
       </template>
     </TableComp>

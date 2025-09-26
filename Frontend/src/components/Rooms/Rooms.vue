@@ -45,7 +45,7 @@ onMounted(async () => {
     <div>
       <EditOptions v-model="editing" :labels="labels" @confirm="addRoom">
         <template #customActions="{keyName, editing}">
-          <CustomButton v-if="keyName === 'editRooms'" @click="toggleTable">{{showTable ? 'Hide Table' : 'Show Tables' }}</CustomButton>
+          <CustomButton v-if="keyName === 'editRooms'" @click="toggleTable">{{showTable ? 'Hide Rooms' : 'Show Rooms' }}</CustomButton>
         </template>
       </EditOptions>
     </div>

@@ -26,7 +26,6 @@ public class ItemService : ICrudService<Item, ItemDto, ItemViewModel>
     public async Task<PageResult<ItemViewModel>> GetAll(int? limit = MaxLimit, int? page = null)
     {
         var userId = _userContext.GetUserId();
-
         var actualLimit = limit ?? int.MaxValue;
         var offset = ((page ?? 1) - 1) * actualLimit;
 

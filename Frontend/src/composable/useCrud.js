@@ -35,7 +35,6 @@ export function useCrud(route) {
     try {
       const response = await service.getById(id);
       item.value = response.data;
-      console.log(item);
     } catch (e) {
       console.error('Error fetching item', e);
     }

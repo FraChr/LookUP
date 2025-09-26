@@ -11,8 +11,8 @@ const router = useRouter();
 <template>
   <div>
     <nav class="z-50 bg-contrast text-primary absolute h-full w-1/3 left-0 bg-customGreen">
-      <ul class="p-5 pl-2 pr-2 [&>*:hover]:text-extra-2
-          [&>*:hover]:underline text-xl flex flex-col gap-2">
+      <ul class="p-5 pl-2 pr-2 [&>li>*:hover]:text-extra-2
+          [&>li>*:hover]:underline text-xl flex flex-col gap-2">
         <li><RouterLink to="/">Home</RouterLink></li>
         <li><RouterLink to="/storage">Storage</RouterLink></li>
         <li><RouterLink to="/user">Profile</RouterLink></li>

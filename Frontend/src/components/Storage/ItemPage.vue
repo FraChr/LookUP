@@ -71,7 +71,6 @@ const confirmEdit = (key) => {
   storage.item.value.shelfsId = Number(tempItem.value.shelfsId);
 
   storage.item.value[key] = tempItem.value[key];
-  console.log('storage.item.value', storage.item.value);
   update();
   editingKey.value = null;
   tempItem.value = {};
@@ -81,7 +80,6 @@ onMounted(async() => {
   await storage.getSingle(id);
   await locations.getAll();
   await shelfs.getAll();
-  console.log("item.value: ", storage.item.value);
 });
 
 </script>

@@ -8,6 +8,8 @@ import ShowData from '@/components/UserPage/ShowData.vue';
 import CustomButton from '@/components/CustomDefaultElements/CustomButton.vue';
 import EditOptions from '@/components/EditOptions.vue';
 import CustomInput from '@/components/CustomDefaultElements/CustomInput.vue';
+import ConfirmDelete from '@/components/ConfirmDelete.vue';
+import Popup from '@/components/Popup.vue';
 
 const { parseJwt } = useJwtClaims();
 const { getToken, logout } = useAccessControl();
@@ -36,16 +38,23 @@ const update = async () => {
   await user.updateItem(parsedToken.id, toSend);
 };
 
+const confirmDelete = ref(false);
+const showConfirmEdit = ref(false);
+
 const deleteProfile = async () => {
   await user.deleteItem(parsedToken.id);
   await logout();
 };
 
+const cancelDeleteProfile = () => {
+  confirmDelete.value = false;
+  showConfirmEdit.value = false;
+}
+
 onMounted(async () => {
   await user.getSingle(parsedToken.id);
 
   Object.assign(tempItem, toRaw(user.item.value));
-  console.log('editing: ', editing);
 });
 </script>
 
@@ -54,15 +63,21 @@ onMounted(async () => {
     <div>
       <EditOptions v-model="editing" :labels="labels" @confirm="update">
         <template #customActions="{ keyName, editing }">
-          <CustomButton v-if="keyName === 'editProfile'" @click="deleteProfile">
+          <CustomButton v-if="keyName === 'editProfile'" @click="showConfirmEdit = true">
             Delete
           </CustomButton>
         </template>
       </EditOptions>
     </div>
 
+
+
     <div class="flex flex-col">
-      <div  v-for="(value, key) in filteredData" :key="key" class="m-2 flex flex-row justify-between">
+      <div
+        v-for="(value, key) in filteredData"
+        :key="key"
+        class="m-2 flex flex-row justify-between"
+      >
         <h2>{{ key }}:</h2>
 
         <CustomInput v-if="editing.editProfile === true" v-model="tempItem[key]"> </CustomInput>
@@ -71,6 +86,12 @@ onMounted(async () => {
       </div>
     </div>
   </div>
+  <Popup :visible="showConfirmEdit">
+    <ConfirmDelete :showConfirmDelete="true"
+                   message="Warning: DELETE USER?"
+                   @confirmDelete="deleteProfile"
+                   @cancelDelete="showConfirmEdit = false"></ConfirmDelete>
+  </Popup>
 </template>
 
 <style scoped></style>

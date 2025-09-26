@@ -38,7 +38,6 @@
 
   onMounted(async () => {
     await shelfs.getAll();
-    console.log("Shelfs items: ", shelfs.items);
   });
 </script>
 
@@ -47,7 +46,7 @@
     <div>
       <EditOptions v-model="editing" :labels="labels" @confirm="addShelf">
         <template #customActions="{keyName, editing}">
-          <CustomButton v-if="keyName === 'editShelf'" @click="toggleTable">{{showTable ? 'Hide Table' : 'Show Tables' }}</CustomButton>
+          <CustomButton v-if="keyName === 'editShelf'" @click="toggleTable">{{showTable ? 'Hide Shelf\'s' : 'Show Shelf\'s' }}</CustomButton>
         </template>
       </EditOptions>
     </div>

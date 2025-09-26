@@ -15,9 +15,6 @@
   });
   const emit = defineEmits(['update:modelValue', 'confirm', 'edit']);
 
-  watch(props.modelValue, (newValue) => {
-    console.log("value of modelvalue in options comp. ",newValue);
-  });
   const updateModelValue = (key, bool) => {
     return {
       ...props.modelValue,
@@ -41,10 +38,6 @@
     emit('update:modelValue', updated);
   }
 
-  onMounted(() => {
-    console.log("modelValue on mount ", props.modelValue);
-  });
-
 </script>
 
 <template>
@@ -62,24 +55,6 @@
 
     <slot name="customActions" :keyName="key" :editing="value === true"></slot>
   </div>
-
-
-
-<!--  <div v-for="(value, key) in modelValue" :key="key" class="w-full flex border-2 gap-2 flex-col">-->
-<!--    <template-->
-<!--      v-if="value === true"-->
-<!--      >-->
-<!--      <div class="flex flex-row justify-evenly w-full">-->
-<!--        <CustomButton class="w-full" @click="confirmEditProfile">Acc</CustomButton>-->
-<!--        <CustomButton class="w-full" @click="cancelEditProfile(key)">X</CustomButton>-->
-<!--      </div>-->
-<!--    </template>-->
-<!--    <template v-else>-->
-<!--      <CustomButton @click="editProfile(key)">Edit Profile</CustomButton>-->
-<!--    </template>-->
-<!--    <CustomButton @click="editStorage">Edit Storage</CustomButton>-->
-<!--    <CustomButton @click="DeleteProfile">Delete Account</CustomButton>-->
-<!--  </div>-->
 </template>
 
 <style scoped>

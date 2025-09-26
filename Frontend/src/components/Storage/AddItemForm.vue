@@ -16,7 +16,7 @@ const shelfs = crudFactory.useShelfs();
 const selectedRoom = ref('');
 const selectedShelf = ref('');
 const tag = ref('');
-const amount = ref();
+const amount = ref(null);
 const errorMsg = ref('');
 
 const { numberInput } = useNormalizeData();
@@ -33,10 +33,9 @@ const add = () => {
     };
 
     storage.addItem(item);
-    console.log("addItem", item);
     selectedRoom.value = '';
     tag.value = '';
-    amount.value = null;
+    amount.value = null
   } catch (error) {
     console.error('error response: ', error.response.data);
     errorMsg.value = error.response?.data?.message || error.message;
@@ -57,12 +56,14 @@ onMounted(() => {
       <!--        <option v-for="room in location.items.value" :key="room.id" :value="room.id">{{ room.name }}</option>-->
       <!--      </select>-->
       <Select
+        required
         v-model="selectedRoom"
         :options="location.items.value"
         :defaultOption="true"
         :defaultOptionValue="'Select Room'"
       />
       <Select
+        required
         v-model="selectedShelf"
         :options="shelfs.items.value"
         :defaultOption="true"

@@ -18,12 +18,6 @@ const clearSearch = () => {
 </script>
 
 <template>
-<!--  <div class="mb-5 flex justify-center gap-5">-->
-<!--    <CustomButton >X</CustomButton>-->
-<!--    <CustomInput v-model="searchTerm" />-->
-<!--    <CustomButton @click="handleSearch">Search</CustomButton>-->
-<!--  </div>-->
-
   <div class="flex justify-center">
     <div class="mb-5 max-w-md flex flex-row border-2 border-contrast p-1">
       <CustomButton @click="clearSearch">X</CustomButton>
