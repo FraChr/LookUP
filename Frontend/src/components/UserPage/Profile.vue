@@ -10,6 +10,7 @@ import EditOptions from '@/components/EditOptions.vue';
 import CustomInput from '@/components/CustomDefaultElements/CustomInput.vue';
 import ConfirmDelete from '@/components/ConfirmDelete.vue';
 import Popup from '@/components/Popup.vue';
+import ProfileLayout from '@/components/UserPage/ProfileLayout.vue';
 
 const { parseJwt } = useJwtClaims();
 const { getToken, logout } = useAccessControl();
@@ -26,6 +27,7 @@ let editing = ref({
 const labels = {
   editProfile: 'Edit Profile',
 };
+const showConfirmDelete = ref(false);
 
 const tempItem = reactive({});
 
@@ -38,18 +40,12 @@ const update = async () => {
   await user.updateItem(parsedToken.id, toSend);
 };
 
-const confirmDelete = ref(false);
-const showConfirmEdit = ref(false);
+
 
 const deleteProfile = async () => {
   await user.deleteItem(parsedToken.id);
   await logout();
 };
-
-const cancelDeleteProfile = () => {
-  confirmDelete.value = false;
-  showConfirmEdit.value = false;
-}
 
 onMounted(async () => {
   await user.getSingle(parsedToken.id);
@@ -59,38 +55,37 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div class="grid grid-cols-2 gap-4 w-full">
-    <div>
+  <ProfileLayout>
+    <template #Right>
       <EditOptions v-model="editing" :labels="labels" @confirm="update">
         <template #customActions="{ keyName, editing }">
-          <CustomButton v-if="keyName === 'editProfile'" @click="showConfirmEdit = true">
+          <CustomButton v-if="keyName === 'editProfile'" @click="showConfirmDelete = true">
             Delete
           </CustomButton>
         </template>
       </EditOptions>
-    </div>
+    </template>
 
+    <template #Left>
 
+        <div
+          v-for="(value, key) in filteredData"
+          :key="key"
+        >
+          <h2>{{ key }}:</h2>
 
-    <div class="flex flex-col">
-      <div
-        v-for="(value, key) in filteredData"
-        :key="key"
-        class="m-2 flex flex-row justify-between"
-      >
-        <h2>{{ key }}:</h2>
+          <CustomInput v-if="editing.editProfile === true" v-model="tempItem[key]"> </CustomInput>
 
-        <CustomInput v-if="editing.editProfile === true" v-model="tempItem[key]"> </CustomInput>
+          <ShowData class="mt-1" v-else :value="value"></ShowData>
+        </div>
+    </template>
+  </ProfileLayout>
 
-        <ShowData class="mt-1" v-else :value="value"></ShowData>
-      </div>
-    </div>
-  </div>
-  <Popup :visible="showConfirmEdit">
+  <Popup :visible="showConfirmDelete">
     <ConfirmDelete :showConfirmDelete="true"
                    message="Warning: DELETE USER?"
                    @confirmDelete="deleteProfile"
-                   @cancelDelete="showConfirmEdit = false"></ConfirmDelete>
+                   @cancelDelete="showConfirmDelete = false"></ConfirmDelete>
   </Popup>
 </template>
 

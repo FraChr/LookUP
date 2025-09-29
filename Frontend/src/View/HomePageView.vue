@@ -41,10 +41,6 @@ onMounted(async () => {
     </div>
   </div>
 
-  <div v-if="hasToken" class="w-full flex justify-center">
-    <AddItemForm />
-  </div>
-
 
 </template>
 

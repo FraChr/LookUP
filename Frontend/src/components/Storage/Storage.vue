@@ -6,9 +6,10 @@ import { crudFactory } from '@/Services/crudFactory.js';
 import { useExcludeKeys } from '@/composable/useExcludeKeys.js';
 import { useNormalizeData } from '@/composable/useNormalizeData.js';
 import TableComp from '@/components/table/TableComp.vue';
-import Select from '@/Select.vue';
 import Paging from '@/components/Storage/Paging.vue'
 import CustomButton from '@/components/CustomDefaultElements/CustomButton.vue';
+import Popup from '@/components/Popup.vue';
+import ConfirmDelete from '@/components/ConfirmDelete.vue';
 
 const { dateFormat } = useNormalizeData();
 
@@ -18,6 +19,8 @@ const headers = useExcludeKeys(storage.items, ['id', 'locationId', 'shelfsId']);
 
 const searchTerm = ref('');
 const router = useRouter();
+let showConfirmDelete = ref(false);
+const selectedEntity = ref({});
 
 const update = async () => storage.getAll(searchTerm.value ? searchTerm.value : undefined);
 
@@ -25,7 +28,6 @@ const handleSearch = (term) => {
   searchTerm.value = term;
   storage.currentPage.value = 1;
   storage.getAll(term);
-  console.log("after getAll call when searching: ", storage.items.value);
 };
 
 const removeItem = async (data) => {
@@ -58,11 +60,6 @@ const navigateToItem = (data) => {
   router.push({ path: `/storage/${data.id}` });
 };
 
-
-watch(storage.totalPages, (newVal, oldVal) => {
-  console.log("totalPages old: " + oldVal + "totalPages new: " + newVal)
-});
-
 onMounted(() => {
   storage.getAll();
 });
@@ -84,8 +81,10 @@ onMounted(() => {
       <template #extraColumns="{ entity }">
         <td>
           <CustomButton
-
-            @click="removeItem(entity)"
+            @click="() => {
+              selectedEntity.value = entity;
+              showConfirmDelete = true;
+            }"
           >
             Delete
           </CustomButton>
@@ -101,6 +100,20 @@ onMounted(() => {
           @toStart="toStart"
           @toEnd="toEnd">
   </Paging>
+
+  <Popup :visible="showConfirmDelete">
+    <ConfirmDelete :show-confirm-delete="true"
+                   :message="`Warning: DELETE ITEM FROM STORAGE ${selectedEntity.value?.name}?`"
+    @confirmDelete="() => {
+      removeItem(selectedEntity.value);
+      showConfirmDelete = false;
+    }"
+    @cancelDelete="() => {
+      selectedEntity.value = {};
+      showConfirmDelete = false;
+    }">
+    </ConfirmDelete>
+  </Popup>
 </template>
 
 <style scoped></style>

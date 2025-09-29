@@ -9,7 +9,7 @@
 
 <template>
   <teleport to="body">
-    <div v-if="visible" class="fixed inset-0 bg-black/30 backdrop-blur-sm z-50 flex items-center justify-center">
+    <div v-if="visible" class="fixed inset-0 bg-primary/30 backdrop-blur-sm z-50 flex items-center justify-center">
       <div>
         <slot />
       </div>

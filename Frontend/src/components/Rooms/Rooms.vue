@@ -1,11 +1,14 @@
 <script setup>
-import { onMounted, ref } from 'vue';
+import { onMounted, ref, watch } from 'vue';
 import { crudFactory } from '@/Services/crudFactory.js';
 import TableComp from '@/components/table/TableComp.vue';
 import { useExcludeKeys } from '@/composable/useExcludeKeys.js';
 import EditOptions from '@/components/EditOptions.vue';
 import CustomInput from '@/components/CustomDefaultElements/CustomInput.vue';
 import CustomButton from '@/components/CustomDefaultElements/CustomButton.vue';
+import ProfileLayout from '@/components/UserPage/ProfileLayout.vue';
+import Popup from '@/components/Popup.vue';
+import ConfirmDelete from '@/components/ConfirmDelete.vue';
 
 const rooms = crudFactory.useLocation();
 const headers = useExcludeKeys(rooms.items, ['id']);
@@ -19,6 +22,8 @@ let editing = ref({
 const labels = {
   editRooms: 'Edit Rooms',
 };
+const showConfirmDelete = ref(false);
+let selectedEntity = ref({});
 
 function toggleTable() {
   showTable.value = !showTable.value;
@@ -30,10 +35,14 @@ async function removeRoom(data) {
 }
 async function addRoom() {
   if (roomName.value === '') return;
-  await rooms.addItem({Name: roomName.value});
+  await rooms.addItem({ Name: roomName.value });
   await rooms.getAll();
   roomName.value = '';
 }
+
+watch(selectedEntity, (newEntity, oldEntity) => {
+  console.log("NEW ENTITY FROM DELETE", typeof newEntity);
+})
 
 onMounted(async () => {
   await rooms.getAll();
@@ -41,16 +50,18 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div class="grid grid-cols-2 gap-4 w-full">
-    <div>
+  <ProfileLayout>
+    <template #Right>
       <EditOptions v-model="editing" :labels="labels" @confirm="addRoom">
-        <template #customActions="{keyName, editing}">
-          <CustomButton v-if="keyName === 'editRooms'" @click="toggleTable">{{showTable ? 'Hide Rooms' : 'Show Rooms' }}</CustomButton>
+        <template #customActions="{ keyName, editing }">
+          <CustomButton v-if="keyName === 'editRooms'" @click="toggleTable">{{
+            showTable ? 'Hide Rooms' : 'Show Rooms'
+          }}</CustomButton>
         </template>
       </EditOptions>
-    </div>
+    </template>
 
-    <div class="flex flex-col gap-4">
+    <template #Left>
       <form v-if="editing.editRooms === true" @submit.prevent="addRoom">
         <label>Add Room</label>
         <CustomInput v-model="roomName" placeholder="Room Name"></CustomInput>
@@ -64,15 +75,39 @@ onMounted(async () => {
           <td class="flex justify-end p-2">
             <CustomButton
               class="border-primary"
-              @click="removeRoom(entity)"
+              @click="
+                () => {
+                  selectedEntity.value = entity;
+                  showConfirmDelete = true;
+                }
+              "
             >
               Delete
             </CustomButton>
           </td>
         </template>
       </TableComp>
-    </div>
-  </div>
+    </template>
+  </ProfileLayout>
+
+  <Popup :visible="showConfirmDelete">
+    <ConfirmDelete
+      :show-confirm-delete="true"
+      :message="`Warning: DELETE ROOM '${selectedEntity.value?.name}'?`"
+      @confirmDelete="
+        () => {
+          removeRoom(selectedEntity.value);
+          showConfirmDelete = false;
+        }
+      "
+      @cancelDelete="
+        () => {
+          selectedEntity.value = {};
+          showConfirmDelete = false;
+        }
+      "
+    ></ConfirmDelete>
+  </Popup>
 </template>
 
 <style scoped></style>
