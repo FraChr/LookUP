@@ -26,8 +26,10 @@ public class ItemService : ICrudService<Item, ItemDto, ItemViewModel>
     public async Task<PageResult<ItemViewModel>> GetAll(int? limit = MaxLimit, int? page = null)
     {
         var userId = _userContext.GetUserId();
-        var actualLimit = limit ?? int.MaxValue;
-        var offset = ((page ?? 1) - 1) * actualLimit;
+        // var actualLimit = limit ?? int.MaxValue;
+        // var offset = ((page ?? 1) - 1) * actualLimit;
+
+        var offset = Paging.CalculateOffset(page, limit);
 
         var query = _context.Items
             .Where(i => i.UserId == userId )
@@ -36,7 +38,7 @@ public class ItemService : ICrudService<Item, ItemDto, ItemViewModel>
             .OrderBy(i => i.Id);
 
         var total = await query.CountAsync();
-        var items = await query.Skip(offset).Take(actualLimit).ToListAsync();
+        var items = await query.Skip(offset).Take(Paging.GetActualLimit(limit)).ToListAsync();
 
         var viewModels = items .Select(item => new ItemViewModel
         {

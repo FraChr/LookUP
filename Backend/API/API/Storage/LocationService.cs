@@ -20,20 +20,26 @@ public class LocationService : ICrudService<Location, LocationDto, LocationViewM
     public async Task<PageResult<LocationViewModel>> GetAll(int? limit = null, int? page = null)
     {
         var userId = _userContext.GetUserId();
+        // var actualLimit = limit ?? int.MaxValue;
+        // var offset = ((page ?? 1) - 1) * actualLimit;
 
+        var offset = Paging.CalculateOffset(page, limit);
 
-        var query = await _context.Room.Where(q => q.UserId == userId).ToListAsync();
+        var query =  _context.Room.Where(q => q.UserId == userId);
 
-        var viewModels = query.Select(q => new LocationViewModel
+        var total = await query.CountAsync();
+        var rooms = await query.Skip(offset).Take(Paging.GetActualLimit(limit)).ToListAsync();
+
+        var viewModels = rooms.Select(room => new LocationViewModel
         {
-            Id = q.Id,
-            Name = q.Name,
+            Id = room.Id,
+            Name = room.Name,
         });
 
         return new PageResult<LocationViewModel>
         {
             Data = viewModels,
-            Total = query.Count(),
+            Total = total,
         };
     }
 

@@ -9,12 +9,14 @@
   import ProfileLayout from '@/components/UserPage/ProfileLayout.vue';
   import Popup from '@/components/Popup.vue';
   import ConfirmDelete from '@/components/ConfirmDelete.vue';
+  import Paging from '@/components/Storage/Paging.vue';
 
   const shelfs = crudFactory.useShelfs();
   const headers = useExcludeKeys(shelfs.items, ['id']);
 
   const shelfName = ref('');
   const showTable = ref(false);
+  const customPageSize = 5;
 
   let editing = ref({
     editShelf: false,
@@ -37,12 +39,32 @@
     shelfName.value = '';
   }
 
+  async function nextPage() {
+    shelfs.currentPage.value++;
+    await shelfs.getAll();
+  }
+
+  async function prevPage() {
+    shelfs.currentPage.value--;
+    await shelfs.getAll();
+  }
+
+  async function toStart() {
+    shelfs.currentPage.value = 1;
+    await shelfs.getAll();
+  }
+  async function toEnd() {
+    shelfs.currentPage.value = shelfs.totalPages.value;
+    await shelfs.getAll();
+  }
+
   async function removeShelf(data) {
     await shelfs.deleteItem(data.id);
     await shelfs.getAll()
   }
 
   onMounted(async () => {
+    shelfs.pageSize.value = customPageSize;
     await shelfs.getAll();
   });
 </script>
@@ -63,7 +85,8 @@
           <CustomInput v-model="shelfName" maxlength="50" placeholder="Shelf Name" />
         </form>
 
-        <TableComp class="min-w-sm flex-shrink" v-if="showTable" :data="shelfs.items" :headers="headers">
+        <div v-if="showTable">
+        <TableComp class="min-w-sm flex-shrink" :data="shelfs.items" :headers="headers">
           <template #extraHeaders>
             <th></th>
           </template>
@@ -81,6 +104,15 @@
             </td>
           </template>
         </TableComp>
+          <div class="flex justify-center min-w-sm ">
+            <Paging :currentPage="shelfs.currentPage.value"
+                    :totalPages="shelfs.totalPages.value"
+                    @nextPage="nextPage"
+                    @previousPage="prevPage"
+                    @toStart="toStart"
+                    @toEnd="toEnd" />
+            </div>
+        </div>
     </template>
   </ProfileLayout>
 

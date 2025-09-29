@@ -1,6 +1,6 @@
 <script setup>
 // import { addItem } from '@/Services/api.js';
-import { onMounted, ref } from 'vue';
+import { onMounted, ref, watch } from 'vue';
 
 import { useNormalizeData } from '@/composable/useNormalizeData.js';
 
@@ -19,7 +19,7 @@ const selectedRoom = ref('');
 const selectedShelf = ref('');
 const tag = ref('');
 const amount = ref(null);
-const errorMsg = ref('');
+const errorMessage = ref('');
 
 const { numberInput } = useNormalizeData();
 
@@ -32,7 +32,7 @@ const labels = {
 
 
 const add = () => {
-  errorMsg.value = '';
+  errorMessage.value = '';
   try {
     const item = {
       Name: tag.value,
@@ -43,13 +43,23 @@ const add = () => {
 
     storage.addItem(item);
     selectedRoom.value = '';
+    selectedShelf.value = '';
     tag.value = '';
     amount.value = null
   } catch (error) {
     console.error('error response: ', error.response.data);
-    errorMsg.value = error.response?.data?.message || error.message;
+
+    if (error.response && error.response.data.message) {
+      errorMessage.value = error.response.data.message;
+    } else {
+      console.error('unknown error: ', error.message);
+    }
   }
 };
+
+watch(errorMessage, (newVal) => {
+  console.log("error response in watch: ", newVal);
+});
 
 onMounted(() => {
   location.getAll();
@@ -64,13 +74,15 @@ onMounted(() => {
       <EditOptions v-model="editing" :labels="labels" @confirm="add">
 
       </EditOptions>
+
+
     </template>
 
     <template #Left>
       <div class="w-full flex flex-col items-center m-4">
-        <form v-if="editing.AddStorage" class="border-2 border-contrast w-full max-w-md flex flex-col space-y-3 p-6">
+        <form v-if="editing.AddStorage" @submit.prevent="add" class="border-2 border-contrast w-full max-w-md flex flex-col space-y-3 p-6">
           <Select
-            required
+
             v-model="selectedRoom"
             :options="location.items.value"
             :defaultOption="true"
@@ -90,7 +102,6 @@ onMounted(() => {
                        required />
           <CustomInput
             v-model="amount"
-            type="text"
             @input="amount = numberInput($event.target.value)"
             placeholder="Amount"
             class="border-2 p-2"
@@ -103,12 +114,14 @@ onMounted(() => {
 <!--              Add</CustomButton>-->
 <!--          </div>-->
         </form>
-        <div v-if="errorMsg" class="text-red-500 font-semibold p-2 text-center">
-          {{ errorMsg }}
+        <div v-if="errorMessage" class="text-red-500 font-semibold p-2 text-center">
+          {{ errorMessage }}
         </div>
       </div>
     </template>
   </ProfileLayout>
+
+
 </template>
 
 <style scoped></style>

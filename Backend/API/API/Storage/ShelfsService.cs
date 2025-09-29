@@ -23,16 +23,23 @@ public class ShelfsService : ICrudService<Shelfs, ShelfsDto, ShelfsViewModel>
     {
         var userId = _userContext.GetUserId();
 
-        var query = await _context.Shelfs.Where(q => q.UserId == userId).ToListAsync();
-        var result = query.Select(q => new ShelfsViewModel
+        var offset = Paging.CalculateOffset(page, limit);
+
+        var query = _context.Shelfs.Where(q => q.UserId == userId);
+
+        var total = await query.CountAsync();
+        var shelfs = await query.Skip(offset).Take(Paging.GetActualLimit(limit)).ToListAsync();
+
+
+        var result = shelfs.Select(shelf => new ShelfsViewModel
         {
-            Id = q.Id,
-            Name = q.Name,
+            Id = shelf.Id,
+            Name = shelf.Name,
         });
         return new PageResult<ShelfsViewModel>
         {
             Data = result,
-            Total = query.Count(),
+            Total = total,
         };
     }
 

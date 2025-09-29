@@ -9,12 +9,14 @@ import CustomButton from '@/components/CustomDefaultElements/CustomButton.vue';
 import ProfileLayout from '@/components/UserPage/ProfileLayout.vue';
 import Popup from '@/components/Popup.vue';
 import ConfirmDelete from '@/components/ConfirmDelete.vue';
+import Paging from '@/components/Storage/Paging.vue';
 
 const rooms = crudFactory.useLocation();
 const headers = useExcludeKeys(rooms.items, ['id']);
 
 const roomName = ref('');
 const showTable = ref(false);
+const customPageSize = 5;
 
 let editing = ref({
   editRooms: false,
@@ -40,11 +42,31 @@ async function addRoom() {
   roomName.value = '';
 }
 
+async function nextPage() {
+  rooms.currentPage.value++;
+  await rooms.getAll();
+}
+
+async function prevPage() {
+  rooms.currentPage.value--;
+  await rooms.getAll();
+}
+
+async function toStart() {
+  rooms.currentPage.value = 1;
+  await rooms.getAll();
+}
+async function toEnd() {
+  rooms.currentPage.value = rooms.totalPages.value;
+  await rooms.getAll();
+}
+
 watch(selectedEntity, (newEntity, oldEntity) => {
   console.log("NEW ENTITY FROM DELETE", typeof newEntity);
 })
 
 onMounted(async () => {
+  rooms.pageSize.value = customPageSize;
   await rooms.getAll();
 });
 </script>
@@ -67,7 +89,8 @@ onMounted(async () => {
         <CustomInput v-model="roomName" placeholder="Room Name"></CustomInput>
       </form>
 
-      <TableComp class="min-w-sm" v-if="showTable" :data="rooms.items" :headers="headers">
+      <div v-if="showTable">
+      <TableComp class="min-w-sm"  :data="rooms.items" :headers="headers">
         <template #extraHeaders>
           <th></th>
         </template>
@@ -87,8 +110,19 @@ onMounted(async () => {
           </td>
         </template>
       </TableComp>
+        <div class="flex justify-center min-w-sm ">
+          <Paging :currentPage="rooms.currentPage.value"
+                  :totalPages="rooms.totalPages.value"
+                  @nextPage="nextPage"
+                  @previousPage="prevPage"
+                  @toStart="toStart"
+                  @toEnd="toEnd" />
+        </div>
+      </div>
     </template>
   </ProfileLayout>
+
+
 
   <Popup :visible="showConfirmDelete">
     <ConfirmDelete
