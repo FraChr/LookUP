@@ -26,7 +26,7 @@ import { computed, unref } from 'vue';
         <slot name="extraHeaders"></slot>
       </tr>
     </thead>
-    <tbody class="[&>*:nth-child(odd)]:bg-extra-1 ">
+    <tbody>
       <tr v-for="entity in resolvedData"
           :key="`entity-${entity.id}`"
           class="border-b bg-contrast  border-gray-700 group"
